@@ -1659,7 +1659,63 @@ void TabPrint::build()
         optgroup->append_single_option_line("min_bead_width");
         optgroup->append_single_option_line("min_feature_size");
 
-    page = add_options_page(L("Output options"), "output+page_white");
+        optgroup = page->new_optgroup(L("Annealing"));
+        optgroup->append_single_option_line("annealing_enabled");
+        // optgroup->append_single_option_line("annealing_temp");
+        // optgroup->append_single_option_line("annealing_time");
+
+        line = {L("Step 1"), ""};
+        line.append_option(optgroup->get_option("annealing_step1_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp1"));
+        line.append_option(optgroup->get_option("annealing_time1"));
+        optgroup->append_line(line);
+        line = {L("Step 2"), ""};
+        line.append_option(optgroup->get_option("annealing_step2_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp2"));
+        line.append_option(optgroup->get_option("annealing_time2"));
+        optgroup->append_line(line);
+        line = {L("Step 3"), ""};
+        line.append_option(optgroup->get_option("annealing_step3_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp3"));
+        line.append_option(optgroup->get_option("annealing_time3"));
+        optgroup->append_line(line);
+        line = {L("Step 4"), ""};
+        line.append_option(optgroup->get_option("annealing_step4_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp4"));
+        line.append_option(optgroup->get_option("annealing_time4"));
+        optgroup->append_line(line);
+        line = {L("Step 5"), ""};
+        line.append_option(optgroup->get_option("annealing_step5_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp5"));
+        line.append_option(optgroup->get_option("annealing_time5"));
+        optgroup->append_line(line);
+        line = {L("Step 6"), ""};
+        line.append_option(optgroup->get_option("annealing_step6_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp6"));
+        line.append_option(optgroup->get_option("annealing_time6"));
+        optgroup->append_line(line);
+        line = {L("Step 7"), ""};
+        line.append_option(optgroup->get_option("annealing_step7_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp7"));
+        line.append_option(optgroup->get_option("annealing_time7"));
+        optgroup->append_line(line);
+        line = {L("Step 8"), ""};
+        line.append_option(optgroup->get_option("annealing_step8_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp8"));
+        line.append_option(optgroup->get_option("annealing_time8"));
+        optgroup->append_line(line);
+        line = {L("Step 9"), ""};
+        line.append_option(optgroup->get_option("annealing_step9_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp9"));
+        line.append_option(optgroup->get_option("annealing_time9"));
+        optgroup->append_line(line);
+        line = {L("Step 10"), ""};
+        line.append_option(optgroup->get_option("annealing_step10_enabled"));
+        line.append_option(optgroup->get_option("annealing_temp10"));
+        line.append_option(optgroup->get_option("annealing_time10"));
+        optgroup->append_line(line);
+
+        page     = add_options_page(L("Output options"), "output+page_white");
         optgroup = page->new_optgroup(L("Sequential printing"));
         optgroup->append_single_option_line("complete_objects", "sequential-printing_124589");
         line = { L("Extruder clearance"), "" };
@@ -1669,7 +1725,9 @@ void TabPrint::build()
 
         optgroup = page->new_optgroup(L("Output file"));
         optgroup->append_single_option_line("gcode_comments");
+        optgroup->append_single_option_line("gcode_line_numbers");
         optgroup->append_single_option_line("gcode_label_objects");
+        optgroup->append_single_option_line("append_cr");
         Option option = optgroup->get_option("output_filename_format");
         option.opt.full_width = true;
         optgroup->append_single_option_line(option);
@@ -2039,6 +2097,10 @@ void TabFilament::build()
         line.append_option(optgroup->get_option("bed_temperature"));
         optgroup->append_line(line);
 
+        line = {L("Print Chamber"), ""};
+        line.append_option(optgroup->get_option("chamber_temperature"));
+        optgroup->append_line(line);
+
     page = add_options_page(L("Cooling"), "cooling");
         std::string category_path = "cooling_127569#";
         optgroup = page->new_optgroup(L("Enable"));
@@ -2075,12 +2137,16 @@ void TabFilament::build()
         optgroup->append_single_option_line("slowdown_below_layer_time", category_path + "cooling-thresholds");
         optgroup->append_single_option_line("min_print_speed", category_path + "cooling-thresholds");
 
-    page = add_options_page(L("Advanced"), "wrench");
+        page = add_options_page(L("Advanced"), "wrench");
         optgroup = page->new_optgroup(L("Filament properties"));
         // Set size as all another fields for a better alignment
         Option option = optgroup->get_option("filament_type");
         option.opt.width = Field::def_width();
         optgroup->append_single_option_line(option);
+        Option option2 = optgroup->get_option("filament_use");
+        optgroup->append_single_option_line(option2);
+        Option option3 = optgroup->get_option("extruder_identity");
+        optgroup->append_single_option_line(option3);
         optgroup->append_single_option_line("filament_soluble");
 
         optgroup = page->new_optgroup(L("Print speed override"));
@@ -2873,7 +2939,7 @@ PageShp TabPrinter::build_kinematics_page()
 }
 
 const std::vector<std::string> extruder_options = {
-    "min_layer_height", "max_layer_height", "extruder_offset",
+    "min_layer_height", "max_layer_height", "extruder_offset", "extruder_heat_rate", "extruder_cd_rate",
     "retract_length", "retract_lift", "retract_lift_above", "retract_lift_below",
     "retract_speed", "deretract_speed", "retract_restart_extra", "retract_before_travel",
     "retract_layer_change", "wipe", "retract_before_wipe",
@@ -3049,6 +3115,10 @@ void TabPrinter::build_extruder_pages(size_t n_before_extruders)
         optgroup = page->new_optgroup(L("Retraction when tool is disabled (advanced settings for multi-extruder setups)"));
         optgroup->append_single_option_line("retract_length_toolchange", "", extruder_idx);
         optgroup->append_single_option_line("retract_restart_extra_toolchange", "", extruder_idx);
+
+        optgroup = page->new_optgroup(L("Temperature limitations"));
+        optgroup->append_single_option_line("extruder_heat_rate", "", extruder_idx);
+        optgroup->append_single_option_line("extruder_cd_rate", "", extruder_idx);
     }
 
     // # remove extra pages

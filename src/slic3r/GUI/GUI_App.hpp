@@ -209,7 +209,7 @@ public:
     // update color mode for whole dialog including all children
     void            UpdateDlgDarkUI(wxDialog* dlg, bool just_buttons_update = false);
     // update color mode for DataViewControl
-    void            UpdateDVCDarkUI(wxDataViewCtrl* dvc, bool highlited = false);
+    void            UpdateDVCDarkUI(wxDataViewCtrl* dvc, bool highlited = true);
     // update color mode for panel including all static texts controls
     void            UpdateAllStaticTextDarkUI(wxWindow* parent);
     void            init_fonts();
@@ -343,7 +343,7 @@ public:
 
     PrintHostJobQueue& printhost_job_queue() { return *m_printhost_job_queue.get(); }
 
-    void            open_web_page_localized(const std::string &http_address);
+    void            open_web_page_localized(const std::string &http_address, bool addLang);
     bool            may_switch_to_SLA_preset(const wxString& caption);
     bool            run_wizard(ConfigWizard::RunReason reason, ConfigWizard::StartPage start_page = ConfigWizard::SP_WELCOME);
     void            show_desktop_integration_dialog();

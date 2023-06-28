@@ -1957,15 +1957,34 @@ public:
 };
 
 PageTemperatures::PageTemperatures(ConfigWizard *parent)
-    : ConfigWizardPage(parent, _L("Nozzle and Bed Temperatures"), _L("Temperatures"), 1)
+    : ConfigWizardPage(parent, _L("Nozzle, Bed, and Chamber Temperatures"), _L("Temperatures"), 1)
     , spin_extr(new SpinCtrlDouble(this))
     , spin_bed (new SpinCtrlDouble(this))
+    , spin_chamber(new SpinCtrlDouble(this))
 {
     spin_extr->SetIncrement(5.0);
     const auto &def_extr = *print_config_def.get("temperature");
     spin_extr->SetRange(def_extr.min, def_extr.max);
     auto *default_extr = def_extr.get_default_value<ConfigOptionInts>();
     spin_extr->SetValue(default_extr != nullptr && default_extr->size() > 0 ? default_extr->get_at(0) : 200);
+
+    spin_chamber->SetIncrement(5.0);
+    const auto &def_chamber = *print_config_def.get("chamber_temperature");
+    spin_chamber->SetRange(def_chamber.min, def_chamber.max);
+    auto *default_chamber = def_chamber.get_default_value<ConfigOptionInts>();
+    spin_chamber->SetValue(default_chamber != nullptr && default_chamber->size() > 0 ? default_chamber->get_at(0) : 0);
+
+    append_text(_L("Enter the temperature needed for printing your custom filament."));
+    append_text(_L("A rule of thumb is 95 °C for ABS, and 225 °C for ULTEM 1010."));
+
+    auto *sizer_chamber = new wxFlexGridSizer(3, 5, 5);
+    auto *text_chamber  = new wxStaticText(this, wxID_ANY, _L("Print Chamber Temperature:"));
+    auto *unit_chamber  = new wxStaticText(this, wxID_ANY, _L("°C"));
+    sizer_chamber->AddGrowableCol(0, 1);
+    sizer_chamber->Add(text_chamber, 0, wxALIGN_CENTRE_VERTICAL);
+    sizer_chamber->Add(spin_chamber);
+    sizer_chamber->Add(unit_chamber, 0, wxALIGN_CENTRE_VERTICAL);
+    append(sizer_chamber);
 
     spin_bed->SetIncrement(5.0);
     const auto &def_bed = *print_config_def.get("bed_temperature");
@@ -2010,6 +2029,8 @@ void PageTemperatures::apply_custom_config(DynamicPrintConfig &config)
     config.set_key_value("bed_temperature", opt_bed);
     auto *opt_bed1st = new ConfigOptionInts(1, spin_bed->GetValue());
     config.set_key_value("first_layer_bed_temperature", opt_bed1st);
+    auto *opt_chamber = new ConfigOptionInts(1, spin_chamber->GetValue());
+    config.set_key_value("chamber_temperature", opt_chamber);
 }
 
 
@@ -3356,8 +3377,8 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     this->SetFont(wxGetApp().normal_font());
 
     p->load_vendors();
-    p->custom_config.reset(DynamicPrintConfig::new_from_defaults_keys({
-        "gcode_flavor", "bed_shape", "bed_custom_texture", "bed_custom_model", "nozzle_diameter", "filament_diameter", "temperature", "bed_temperature",
+    p->custom_config.reset(DynamicPrintConfig::new_from_defaults_keys({"gcode_flavor", "bed_shape", "bed_custom_texture", "bed_custom_model",
+                                                    "nozzle_diameter", "filament_diameter", "temperature", "bed_temperature", "chamber_temperature"
     }));
 
     p->index = new ConfigWizardIndex(this);

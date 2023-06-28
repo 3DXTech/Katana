@@ -438,6 +438,15 @@ void PrintConfigDef::init_fff_params()
     def->max = 300;
     def->set_default_value(new ConfigOptionInts { 0 });
 
+    def           = this->add("chamber_temperature", coInts);
+    def->label    = L("Print chamber temperature");
+    def->tooltip  = L("Temperature for the print chamber. "
+                     "This can be adjusted when printing with custom materials. ");
+    def->sidetext = L("°C");
+    def->min      = 0;
+    def->max      = 250;
+    def->set_default_value(new ConfigOptionInts{0});
+
     def = this->add("before_layer_gcode", coString);
     def->label = L("Before layer change G-code");
     def->tooltip = L("This custom code is inserted at every layer change, right before the Z move. "
@@ -930,6 +939,24 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionPoints { Vec2d(0,0) });
 
+    def           = this->add("extruder_heat_rate", coFloats);
+    def->label    = L("Extruder heat rate");
+    def->tooltip  = L("coming soon");
+    def->sidetext = L("°C/s");
+    def->min      = 0;
+    def->max      = 20;
+    def->mode     = comExpert;
+    def->set_default_value(new ConfigOptionFloats{2.6});
+
+    def           = this->add("extruder_cd_rate", coFloats);
+    def->label    = L("Extruder cooldown rate");
+    def->tooltip  = L("coming soon");
+    def->sidetext = L("°C/s");
+    def->min      = 0;
+    def->max      = 20;
+    def->mode     = comExpert;
+    def->set_default_value(new ConfigOptionFloats{ 1.4 });
+
     def = this->add("extrusion_axis", coString);
     def->label = L("Extrusion axis");
     def->tooltip = L("Use this option to set the axis letter associated to your printer's extruder "
@@ -1149,11 +1176,32 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionStrings { "PLA" });
 
+    def = this->add("filament_use", coStrings);
+    def->label = L("Filament use");
+    def->tooltip = L("The materials intended use during the print.");
+    def->gui_flags = "show_value";
+    def->set_enum_values(ConfigOptionDef::GUIType::select_open, {
+            "Model", 
+            "Support", 
+            "Not Specified"
+    });
+    def->mode = comAdvanced;
+    def->set_default_value(new ConfigOptionStrings{"Not Specified"});
+
     def = this->add("filament_soluble", coBools);
     def->label = L("Soluble material");
     def->tooltip = L("Soluble material is most likely used for a soluble support.");
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionBools { false });
+
+    def = this->add("extruder_identity", coInt);
+    def->label = L("Extruder identity");
+    def->tooltip = L("Identify which extruder a material will be assigned to.");
+    def->gui_flags = "show_value";
+    def->min       = 1;
+    def->max       = 256;
+    def->mode      = comExpert;
+    def->set_default_value(new ConfigOptionInt(1));
 
     def = this->add("filament_cost", coFloats);
     def->label = L("Cost");
@@ -1394,6 +1442,12 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionBool(0));
 
+    def = this->add("gcode_line_numbers", coBool);
+    def->label = L("Insert G-code line numbers");
+    def->tooltip = L("Enable this to insert line numbers into generated G-Code.");
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionBool(0));
+
     def = this->add("gcode_flavor", coEnum);
     def->label = L("G-code flavor");
     def->tooltip = L("Some G/M-code commands, including temperature control and others, are not universal. "
@@ -1416,6 +1470,12 @@ void PrintConfigDef::init_fff_params()
     });
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionEnum<GCodeFlavor>(gcfRepRapSprinter));
+
+    def = this->add("append_cr", coBool);
+    def->label = L("Append carriage return");
+    def->tooltip = L("Enable this to add carriage returns to the end of each line in gcode.");
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionBool(0));
 
     def = this->add("gcode_label_objects", coBool);
     def->label = L("Label objects");
@@ -3362,6 +3422,263 @@ void PrintConfigDef::init_fff_params()
     def->min = 0;
     def->set_default_value(new ConfigOptionFloatOrPercent(85, true));
 
+    def           = this->add("annealing_enabled", coBool);
+    def->label    = L("Annealing Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will be added to the end of the print");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_step1_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp1", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time1", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step2_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp2", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time2", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step3_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp3", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time3", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step4_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp4", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time4", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step5_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp5", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time5", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step6_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp6", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time6", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step7_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp7", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time7", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step8_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp8", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time8", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step9_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp9", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time9", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
+    def           = this->add("annealing_step10_enabled", coBool);
+    def->label    = L("Step Enabled");
+    def->category = L("Advanced");
+    def->tooltip  = L("If checked, annealing process will include this step");
+    def->mode     = comSimple;
+    def->set_default_value(new ConfigOptionBool(false));
+
+    def           = this->add("annealing_temp10", coInt);
+    def->label    = L("Annealing Temperature");
+    def->category = L("Advanced");
+    def->tooltip  = L("Temperature to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(90));
+
+    def           = this->add("annealing_time10", coInt);
+    def->label    = L("Annealing Time (minutes)");
+    def->category = L("Advanced");
+    def->tooltip  = L("Time to use during the annealing process");
+    def->sidetext = L("°");
+    def->mode     = comExpert;
+    def->min      = 0;
+    def->set_default_value(new ConfigOptionInt(30));
+
     // Declare retract values for filament profile, overriding the printer's extruder profile.
     for (const char *opt_key : {
         // floats
@@ -3391,7 +3708,7 @@ void PrintConfigDef::init_extruder_option_keys()
 {
     // ConfigOptionFloats, ConfigOptionPercents, ConfigOptionBools, ConfigOptionStrings
     m_extruder_option_keys = {
-        "nozzle_diameter", "min_layer_height", "max_layer_height", "extruder_offset",
+        "nozzle_diameter", "min_layer_height", "max_layer_height", "extruder_offset", "extruder_heat_rate", "extruder_cd_rate",
         "retract_length", "retract_lift", "retract_lift_above", "retract_lift_below", "retract_speed", "deretract_speed",
         "retract_before_wipe", "retract_restart_extra", "retract_before_travel", "wipe",
         "retract_layer_change", "retract_length_toolchange", "retract_restart_extra_toolchange", "extruder_colour",
@@ -4412,7 +4729,7 @@ void DynamicPrintConfig::set_num_extruders(unsigned int num_extruders)
 {
     const auto &defaults = FullPrintConfig::defaults();
     for (const std::string &key : print_config_def.extruder_option_keys()) {
-        if (key == "default_filament_profile")
+        if (key == "default_filament_profile" || key == "extruder_heat_rate" || key == "extruder_cd_rate")
             // Don't resize this field, as it is presented to the user at the "Dependencies" page of the Printer profile and we don't want to present
             // empty fields there, if not defined by the system profile.
             continue;
@@ -4455,6 +4772,11 @@ std::string validate(const FullPrintConfig &cfg)
     // --first-layer-height
     if (cfg.first_layer_height.value <= 0)
         return "Invalid value for --first-layer-height";
+
+    // --extruder-heat-rate
+    for (double ehr : cfg.extrusion_multiplier.values)
+        if (ehr < 0)
+            return "Invalid value for --extruder-heat-rate";
 
     // --filament-diameter
     for (double fd : cfg.filament_diameter.values)

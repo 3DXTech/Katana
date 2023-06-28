@@ -463,10 +463,14 @@ void GCodeProcessorResult::reset() {
     settings_ids.reset();
     extruders_count = 0;
     backtrace_enabled = false;
+    ooze_prevention = false;
     extruder_colors = std::vector<std::string>();
     filament_diameters = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_DIAMETER);
     filament_densities = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_DENSITY);
     filament_cost = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_COST);
+    annealing_enabled = false;
+    annealing_temp1 = 0;
+    annealing_time1 = 0;
     custom_gcode_per_print_z = std::vector<CustomGCode::Item>();
     spiral_vase_layers = std::vector<std::pair<float, std::pair<size_t, size_t>>>();
     conflict_result = std::nullopt;
@@ -558,6 +562,40 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_flavor = config.gcode_flavor;
 
     m_result.backtrace_enabled = is_XL_printer(config);
+    m_result.ooze_prevention   = config.ooze_prevention;
+    m_result.append_cr                = config.append_cr;
+    m_result.gcode_line_numbers       = config.gcode_line_numbers;
+    m_result.annealing_enabled        = config.annealing_enabled;
+    m_result.annealing_step1_enabled  = config.annealing_step1_enabled;
+    m_result.annealing_temp1          = config.annealing_temp1;
+    m_result.annealing_time1          = config.annealing_time1;
+    m_result.annealing_step2_enabled  = config.annealing_step2_enabled;
+    m_result.annealing_temp2          = config.annealing_temp2;
+    m_result.annealing_time2          = config.annealing_time2;
+    m_result.annealing_step3_enabled  = config.annealing_step3_enabled;
+    m_result.annealing_temp3          = config.annealing_temp3;
+    m_result.annealing_time3          = config.annealing_time3;
+    m_result.annealing_step4_enabled  = config.annealing_step4_enabled;
+    m_result.annealing_temp4          = config.annealing_temp4;
+    m_result.annealing_time4          = config.annealing_time4;
+    m_result.annealing_step5_enabled  = config.annealing_step5_enabled;
+    m_result.annealing_temp5          = config.annealing_temp5;
+    m_result.annealing_time5          = config.annealing_time5;
+    m_result.annealing_step6_enabled  = config.annealing_step6_enabled;
+    m_result.annealing_temp6          = config.annealing_temp6;
+    m_result.annealing_time6          = config.annealing_time6;
+    m_result.annealing_step7_enabled  = config.annealing_step7_enabled;
+    m_result.annealing_temp7          = config.annealing_temp7;
+    m_result.annealing_time7          = config.annealing_time7;
+    m_result.annealing_step8_enabled  = config.annealing_step8_enabled;
+    m_result.annealing_temp8          = config.annealing_temp8;
+    m_result.annealing_time8          = config.annealing_time8;
+    m_result.annealing_step9_enabled  = config.annealing_step9_enabled;
+    m_result.annealing_temp9          = config.annealing_temp9;
+    m_result.annealing_time9          = config.annealing_time9;
+    m_result.annealing_step10_enabled = config.annealing_step10_enabled;
+    m_result.annealing_temp10         = config.annealing_temp10;
+    m_result.annealing_time10         = config.annealing_time10;
 
     size_t extruders_count = config.nozzle_diameter.values.size();
     m_result.extruders_count = extruders_count;
@@ -569,6 +607,7 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_result.filament_cost.resize(extruders_count);
     m_extruder_temps.resize(extruders_count);
     m_extruder_temps_config.resize(extruders_count);
+    m_extruder_standbytemps_config.resize(extruders_count);
     m_extruder_temps_first_layer_config.resize(extruders_count);
     m_is_XL_printer = is_XL_printer(config);
 
@@ -576,6 +615,7 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
         m_extruder_offsets[i]           = to_3d(config.extruder_offset.get_at(i).cast<float>().eval(), 0.f);
         m_extruder_colors[i]            = static_cast<unsigned char>(i);
         m_extruder_temps_config[i]      = static_cast<int>(config.temperature.get_at(i));
+        m_extruder_standbytemps_config[i]      = static_cast<int>(config.standby_temperature_delta.value);
         m_extruder_temps_first_layer_config[i] = static_cast<int>(config.first_layer_temperature.get_at(i));
         m_result.filament_diameters[i]  = static_cast<float>(config.filament_diameter.get_at(i));
         m_result.filament_densities[i]  = static_cast<float>(config.filament_density.get_at(i));
@@ -3637,6 +3677,47 @@ void GCodeProcessor::post_process()
             }
         }
 
+        void insert_preheat_lines(const Backtrace &                                      backtrace,
+                                  const std::string &                                    cmd,
+                                  std::function<std::string(unsigned int, float, float)> line_inserter,
+                                  std::function<std::string(const std::string &)>        line_replacer,
+                                  const int                                              active_temp,
+                                  const int                                              standby_temp)
+        {
+            assert(!m_lines.empty());
+            size_t rev_it_dist         = 0;    // distance from the end of the cache of the starting point of the backtrace
+            float  last_time_insertion = 0.0f; // used to avoid inserting two lines at the same time
+
+            const float backtrace_time_i = ((standby_temp * -1) / 2.7) * 1.5;
+            const float time_threshold_i = m_time - backtrace_time_i;
+            auto        rev_it           = m_lines.rbegin() + rev_it_dist;
+            auto        start_rev_it     = rev_it;
+
+            // backtrace into the cache to find the place where to insert the line
+            while (rev_it != m_lines.rend() && rev_it->time > time_threshold_i && GCodeReader::GCodeLine::extract_cmd(rev_it->line) != (cmd == "T0" ? "T1" : "T0")) {
+                rev_it->line = line_replacer(rev_it->line);
+                ++rev_it;
+            }
+
+            if (rev_it == m_lines.rend() || (rev_it != start_rev_it && rev_it->time != last_time_insertion)) {
+                bool reachedEnd      = rev_it == m_lines.rend();
+                last_time_insertion  = reachedEnd ? m_lines.begin()->time : rev_it->time;
+                std::string out_line = line_inserter(1, last_time_insertion, m_time - last_time_insertion);
+                rev_it_dist          = std::distance(m_lines.rbegin(), rev_it) + 1;
+                const auto new_it    = m_lines.insert(rev_it.base(), {out_line, reachedEnd ? m_lines.begin()->time : rev_it->time});
+#ifndef NDEBUG
+                m_statistics.add_line(out_line.length());
+#endif // NDEBUG
+                m_size += out_line.length();
+                // synchronize gcode lines map
+                for (auto map_it = m_gcode_lines_map.rbegin(); map_it != m_gcode_lines_map.rbegin() + rev_it_dist - 1; ++map_it) {
+                    ++map_it->second;
+                }
+
+                ++m_added_lines_counter;
+            }
+        }
+
         // write to file:
         // m_write_type == EWriteType::ByTime - all lines older than m_time - backtrace_time
         // m_write_type == EWriteType::BySize - all lines if current size is greater than 65535 bytes
@@ -3920,14 +4001,14 @@ void GCodeProcessor::post_process()
     };
 
     // add lines XXX to exported gcode
-    auto process_line_T = [this, &export_lines](const std::string& gcode_line, const size_t g1_lines_counter, const ExportLines::Backtrace& backtrace) {
+    auto process_line_T = [this, &export_lines](const std::string& gcode_line, const size_t g1_lines_counter, const ExportLines::Backtrace& backtrace, const bool backtraceEnabled) {
         const std::string cmd = GCodeReader::GCodeLine::extract_cmd(gcode_line);
         if (cmd.size() >= 2) {
             std::stringstream ss(cmd.substr(1));
             int tool_number = -1;
             ss >> tool_number;
             if (tool_number != -1) {
-                if (tool_number < 0 || (int)m_extruder_temps_config.size() <= tool_number) {
+                if (tool_number < 0 || (int) m_extruder_temps_config.size() <= tool_number) {
                     // found an invalid value, clamp it to a valid one
                     tool_number = std::clamp<int>(0, m_extruder_temps_config.size() - 1, tool_number);
                     // emit warning
@@ -3939,29 +4020,96 @@ void GCodeProcessor::post_process()
                     if (m_print != nullptr)
                         m_print->active_step_add_warning(PrintStateBase::WarningLevel::CRITICAL, warning);
                 }
-            }
-            export_lines.insert_lines(backtrace, cmd,
-                // line inserter
-                [tool_number, this](unsigned int id, float time, float time_diff) {
-                    int temperature = int( m_layer_id != 1 ? m_extruder_temps_config[tool_number] : m_extruder_temps_first_layer_config[tool_number]);
-                    const std::string out = "M104 T" + std::to_string(tool_number) + " P" + std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature) + "\n";
-                    return out;
-                },
-                // line replacer
-                [this, tool_number](const std::string& line) {
-                    if (GCodeReader::GCodeLine::cmd_is(line, "M104")) {
-                        GCodeReader::GCodeLine gline;
-                        GCodeReader reader;
-                        reader.parse_line(line, [&gline](GCodeReader& reader, const GCodeReader::GCodeLine& l) { gline = l; });
 
-                        float val;
-                        if (gline.has_value('T', val) && gline.raw().find("cooldown") != std::string::npos && m_is_XL_printer) {
-                            if (static_cast<int>(val) == tool_number)
-                                return std::string("; removed M104\n");
-                        }
-                    }
-                    return line;
-                });
+                if (backtraceEnabled) {
+                    export_lines.insert_lines(
+                        backtrace, cmd,
+                        // line inserter
+                        [tool_number, this](unsigned int id, float time, float time_diff) {
+                            int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
+                                                                                  m_extruder_temps_first_layer_config[tool_number]);
+                            const std::string out         = "M104 T" + std::to_string(tool_number) + " P" +
+                                                    std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature) + "\n";
+                            return out;
+                        },
+                        // line replacer
+                        [this, tool_number](const std::string &line) {
+                            if (GCodeReader::GCodeLine::cmd_is(line, "M104")) {
+                                GCodeReader::GCodeLine gline;
+                                GCodeReader            reader;
+                                reader.parse_line(line, [&gline](GCodeReader &reader, const GCodeReader::GCodeLine &l) { gline = l; });
+
+                                float val;
+                                if (gline.has_value('T', val) && gline.raw().find("cooldown") != std::string::npos && m_is_XL_printer) {
+                                    if (static_cast<int>(val) == tool_number)
+                                        return std::string("; removed M104\n");
+                                }
+                            }
+                            return line;
+                        });
+                } else if (m_result.ooze_prevention) {
+                    export_lines.insert_preheat_lines(
+                        backtrace, cmd,
+                        // line inserter
+                        [tool_number, this](unsigned int id, float time, float time_diff) {
+                            int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
+                                                                                  m_extruder_temps_first_layer_config[tool_number]);
+                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) + "\n";
+                            return out;
+                        },
+                        // line replacer
+                        [this, tool_number](const std::string &line) {
+                            if (GCodeReader::GCodeLine::cmd_is(line, "M104")) {
+                                GCodeReader::GCodeLine gline;
+                                GCodeReader            reader;
+                                reader.parse_line(line, [&gline](GCodeReader &reader, const GCodeReader::GCodeLine &l) { gline = l; });
+
+                                float val;
+                                if (gline.has_value('T', val) && gline.raw().find("cooldown") != std::string::npos && m_is_XL_printer) {
+                                    if (static_cast<int>(val) == tool_number)
+                                        return std::string("; removed M104\n");
+                                }
+                            }
+                            return line;
+                        },
+                        int(m_extruder_temps_config[tool_number]),
+                        int(m_extruder_standbytemps_config[tool_number]));
+                }
+            }
+        }
+    };
+
+    auto process_annealing_steps = [this, &export_lines]() {
+        AnnealingStep steps[] = {
+            AnnealingStep{m_result.annealing_step1_enabled, m_result.annealing_temp1, m_result.annealing_time1},
+            AnnealingStep{m_result.annealing_step2_enabled, m_result.annealing_temp2, m_result.annealing_time2},
+            AnnealingStep{m_result.annealing_step3_enabled, m_result.annealing_temp3, m_result.annealing_time3},
+            AnnealingStep{m_result.annealing_step4_enabled, m_result.annealing_temp4, m_result.annealing_time4},
+            AnnealingStep{m_result.annealing_step5_enabled, m_result.annealing_temp5, m_result.annealing_time5},
+            AnnealingStep{m_result.annealing_step6_enabled, m_result.annealing_temp6, m_result.annealing_time6},
+            AnnealingStep{m_result.annealing_step7_enabled, m_result.annealing_temp7, m_result.annealing_time7},
+            AnnealingStep{m_result.annealing_step8_enabled, m_result.annealing_temp8, m_result.annealing_time8},
+            AnnealingStep{m_result.annealing_step9_enabled, m_result.annealing_temp9, m_result.annealing_time9},
+            AnnealingStep{m_result.annealing_step10_enabled, m_result.annealing_temp10, m_result.annealing_time10},
+        };
+
+        int totalTime = 0;
+        for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
+            if (!steps[i].enabled)
+                continue;
+
+            export_lines.append_line("M141 S" + std::to_string(steps[i].temp) + "\n");
+            totalTime += steps[i].time;
+        }
+
+        export_lines.append_line("M73 P100 R" + std::to_string(totalTime) + "\n");
+
+        for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
+            if (!steps[i].enabled)
+                continue;
+
+            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + "\n");
+            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + "\n");
         }
     };
 
@@ -3998,7 +4146,10 @@ void GCodeProcessor::post_process()
                     ++line_id;
                     export_lines.update(line_id, g1_lines_counter);
 
-                    gcode_line += "\n";
+                    gcode_line += !m_result.append_cr ? "\n" : "\r\n";
+
+                    if (m_result.gcode_line_numbers)
+                        gcode_line.insert(0, "N" + std::to_string(line_id));
                     // replace placeholder lines
                     bool processed = process_placeholders(gcode_line);
                     if (processed)
@@ -4011,8 +4162,10 @@ void GCodeProcessor::post_process()
                             process_line_G1(g1_lines_counter++);
                         else if (m_result.backtrace_enabled && GCodeReader::GCodeLine::cmd_starts_with(gcode_line, "T")) {
                             // add lines XXX where needed
-                            process_line_T(gcode_line, g1_lines_counter, backtrace_T);
+                            process_line_T(gcode_line, g1_lines_counter, backtrace_T, m_result.backtrace_enabled);
                             max_backtrace_time = std::max(max_backtrace_time, backtrace_T.time);
+                        } else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, ";anneal") && m_result.annealing_enabled) {
+                            process_annealing_steps();
                         }
                     }
 
