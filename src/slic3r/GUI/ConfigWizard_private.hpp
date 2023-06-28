@@ -506,6 +506,7 @@ struct PageTemperatures: ConfigWizardPage
 {
     wxSpinCtrlDouble *spin_extr;
     wxSpinCtrlDouble *spin_bed;
+    wxSpinCtrlDouble *spin_chamber;
 
     PageTemperatures(ConfigWizard *parent);
     virtual void apply_custom_config(DynamicPrintConfig &config);

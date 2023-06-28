@@ -69,6 +69,14 @@ SCENARIO("Config accessor functions perform as expected.", "[Config]") {
                 REQUIRE(config.opt<ConfigOptionInts>("bed_temperature")->get_at(0) == 100);
             }
         }
+        WHEN("A numeric option is set from serialized string")
+        {
+            config.set_deserialize_strict("chamber_temperature", "100");
+            THEN("The underlying value is set correctly.")
+            {
+                REQUIRE(config.opt<ConfigOptionInts>("chamber_temperature")->get_at(0) == 100);
+            }
+        }
 #if 0
         //FIXME better design accessors for vector elements.
         WHEN("An integer-based option is set through the integer interface") {

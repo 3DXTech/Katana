@@ -144,10 +144,44 @@ namespace Slic3r {
         SettingsIds settings_ids;
         size_t extruders_count;
         bool backtrace_enabled;
+        bool ooze_prevention;
+        bool append_cr;
+        bool gcode_line_numbers;
         std::vector<std::string> extruder_colors;
         std::vector<float> filament_diameters;
         std::vector<float> filament_densities;
         std::vector<float> filament_cost;
+        bool annealing_enabled;
+        bool annealing_step1_enabled;
+        int annealing_temp1;
+        int annealing_time1;
+        bool annealing_step2_enabled;
+        int annealing_temp2;
+        int annealing_time2;
+        bool annealing_step3_enabled;
+        int annealing_temp3;
+        int annealing_time3;
+        bool annealing_step4_enabled;
+        int annealing_temp4;
+        int annealing_time4;
+        bool annealing_step5_enabled;
+        int annealing_temp5;
+        int annealing_time5;
+        bool annealing_step6_enabled;
+        int annealing_temp6;
+        int annealing_time6;
+        bool annealing_step7_enabled;
+        int annealing_temp7;
+        int annealing_time7;
+        bool annealing_step8_enabled;
+        int annealing_temp8;
+        int annealing_time8;
+        bool annealing_step9_enabled;
+        int annealing_temp9;
+        int annealing_time9;
+        bool annealing_step10_enabled;
+        int annealing_temp10;
+        int annealing_time10;
 
         PrintEstimatedStatistics print_statistics;
         std::vector<CustomGCode::Item> custom_gcode_per_print_z;
@@ -565,6 +599,7 @@ namespace Slic3r {
         ExtruderColors m_extruder_colors;
         ExtruderTemps m_extruder_temps;
         ExtruderTemps m_extruder_temps_config;
+        ExtruderTemps m_extruder_standbytemps_config;
         ExtruderTemps m_extruder_temps_first_layer_config;
         bool  m_is_XL_printer = false;
         float m_parking_position;
@@ -598,6 +633,13 @@ namespace Slic3r {
             ideaMaker,
             KissSlicer,
             BambuStudio
+        };
+
+        struct AnnealingStep
+        {
+            bool enabled;
+            int  temp;
+            int  time;
         };
 
         static const std::vector<std::pair<GCodeProcessor::EProducer, std::string>> Producers;

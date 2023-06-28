@@ -1315,6 +1315,8 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     this->_print_first_layer_bed_temperature(file, print, start_gcode, initial_extruder_id, true);
     // Set extruder(s) temperature before and after start G-code.
     this->_print_first_layer_extruder_temperatures(file, print, start_gcode, initial_extruder_id, false);
+    // Set chamber temperature before and after start G-code.
+    this->_chamber_temperature(file, print, start_gcode, final_extruder_id, true);
 
     // adds tag for processor
     file.write_format(";%s%s\n", GCodeProcessor::reserved_tag(GCodeProcessor::ETags::Role).c_str(), gcode_extrusion_role_to_string(GCodeExtrusionRole::Custom).c_str());
@@ -1849,6 +1851,25 @@ void GCode::print_machine_envelope(GCodeOutputStream &file, Print &print)
             // all moves. This is currently not implemented.
         }
     }
+}
+
+// Write chamber temperature into the G-code.
+// Only do that if the start G-code does not already contain any M-code controlling an chamber temperature.
+// M141 - Set Chamber Temperature
+void GCode::_chamber_temperature(GCodeOutputStream &file, Print &print, const std::string &gcode, unsigned int chamber_id, bool wait)
+{
+    // Chamber temperature based on the model filament.
+    int temp = print.config().chamber_temperature.get_at(chamber_id);
+    // Is the chamber temperature set by the provided custom G-code?
+    int  temp_by_gcode     = -1;
+    bool temp_set_by_gcode = custom_gcode_sets_temperature(gcode, 141, 191, false, temp_by_gcode);
+    if (temp_set_by_gcode && temp_by_gcode >= 0 && temp_by_gcode < 1000)
+        temp = temp_by_gcode;
+    // Always call m_writer.set_chamber_temperature() so it will set the internal "current" state of the chamber temp as if
+    // the custom start G-code emited these.
+    std::string set_temp_gcode = m_writer.set_chamber_temperature(temp, wait);
+    if (!temp_set_by_gcode)
+        file.write(set_temp_gcode);
 }
 
 // Write 1st layer bed temperatures into the G-code.

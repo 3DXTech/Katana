@@ -127,6 +127,24 @@ std::string GCodeWriter::set_temperature(unsigned int temperature, bool wait, in
     return gcode.str();
 }
 
+std::string GCodeWriter::set_chamber_temperature(unsigned int temperature, bool wait)
+{
+    if (temperature == m_last_chamber_temperature && (!wait || m_last_chamber_temperature_reached))
+        return std::string();
+
+    m_last_chamber_temperature         = temperature;
+    m_last_chamber_temperature_reached = wait;
+
+    std::string code = wait ? "M191" : "M141", comment;
+    if (wait) {
+        comment = "set chamber temperature and wait for it to be reached";
+    } else {
+        comment = "set chamber temperature";
+    }
+    code += " S" + std::to_string(temperature) + " ; " + comment;
+    return code;
+}
+
 std::string GCodeWriter::set_bed_temperature(unsigned int temperature, bool wait)
 {
     if (temperature == m_last_bed_temperature && (! wait || m_last_bed_temperature_reached))
