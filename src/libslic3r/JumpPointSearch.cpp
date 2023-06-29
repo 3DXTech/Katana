@@ -324,7 +324,7 @@ Polyline JPSPathFinder::find_path(const Point &p0, const Point &p1)
     }
 
 #ifdef DEBUG_FILES
-    svg.draw(Polyline(scaled_points(out_path)), "orange", scale_(0.20));
+    svg.draw(Polyline(scaled_points(out_path)), "red", scale_(0.20));
 #endif
 
     tmp_path.clear();

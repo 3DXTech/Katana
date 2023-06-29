@@ -1858,7 +1858,7 @@ void GLGizmoEmboss::draw_font_list_line()
     bool exist_change_in_font = m_style_manager.is_font_changed();
     const std::string& font_text = m_gui_cfg->translations.font;
     if (exist_change_in_font || !exist_stored_style)
-        ImGuiWrapper::text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, font_text);
+        ImGuiWrapper::text_colored(ImGuiWrapper::COL_RED_LIGHT, font_text);
     else
         ImGuiWrapper::text(font_text);
 
@@ -2164,9 +2164,9 @@ void GLGizmoEmboss::draw_style_rename_popup() {
     }
     bool allow_change = false;
     if (new_name.empty()) {
-        m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_DARK, _u8L("Name can't be empty."));
+        m_imgui->text_colored(ImGuiWrapper::COL_RED_DARK, _u8L("Name can't be empty."));
     }else if (!is_unique) { 
-        m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_DARK, _u8L("Name has to be unique."));
+        m_imgui->text_colored(ImGuiWrapper::COL_RED_DARK, _u8L("Name has to be unique."));
     } else {
         ImGui::NewLine();
         allow_change = true;
@@ -2249,9 +2249,9 @@ void GLGizmoEmboss::draw_style_save_as_popup() {
         
     bool allow_change = false;
     if (new_name.empty()) {
-        m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_DARK, _u8L("Name can't be empty."));
+        m_imgui->text_colored(ImGuiWrapper::COL_RED_DARK, _u8L("Name can't be empty."));
     }else if (!is_unique) { 
-        m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_DARK, _u8L("Name has to be unique."));
+        m_imgui->text_colored(ImGuiWrapper::COL_RED_DARK, _u8L("Name has to be unique."));
     } else {
         ImGui::NewLine();
         allow_change = true;
@@ -2420,7 +2420,7 @@ void GLGizmoEmboss::draw_style_list() {
     if (m_style_manager.exist_stored_style())
         ImGui::Text("%s", title.c_str());
     else
-        ImGui::TextColored(ImGuiWrapper::COL_ORANGE_LIGHT, "%s", title.c_str());
+        ImGui::TextColored(ImGuiWrapper::COL_RED_LIGHT, "%s", title.c_str());
         
     ImGui::SetNextItemWidth(m_gui_cfg->input_width);
     auto add_text_modify = [&is_modified](const std::string& name) {
@@ -2644,7 +2644,7 @@ bool GLGizmoEmboss::revertible(const std::string &name,
 {
     bool changed = exist_change(value, default_value);
     if (changed || default_value == nullptr)
-        ImGuiWrapper::text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, name);
+        ImGuiWrapper::text_colored(ImGuiWrapper::COL_RED_LIGHT, name);
     else
         ImGuiWrapper::text(name);
 

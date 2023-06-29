@@ -340,7 +340,7 @@ static inline void dump_voronoi_to_svg(
     const std::string   offsetCurveColor            = "magenta";
     const coord_t       offsetCurveLineWidth        = coord_t(0.02 * scale);
 
-    const std::string   helperLineColor             = "orange";
+    const std::string   helperLineColor             = "red";
     const coord_t       helperLineWidth             = coord_t(0.04 * scale);
 
     const bool          primaryEdgesOnly            = false;

@@ -1147,7 +1147,7 @@ static const wxString sep_space = "";
 static wxMenu* generate_help_menu()
 {
     wxMenu* helpMenu = new wxMenu();
-    append_menu_item(helpMenu, wxID_ANY, _L("3DXTech Filament and Accessories"), _L("Open the 3DXTech website in your browser."),
+    append_menu_item(helpMenu, wxID_ANY, _L("Buy Filament and Accessories"), _L("Open the 3DXTech website in your browser."),
                      [](wxCommandEvent &) { wxGetApp().open_web_page_localized("https://www.3dxtech.com/products", false); });
     append_menu_item(helpMenu, wxID_ANY, _L("Prusa 3D &Drivers"), _L("Open the Prusa3D drivers download page in your browser"),
         [](wxCommandEvent&) { wxGetApp().open_web_page_localized("https://www.prusa3d.com/downloads", true); });

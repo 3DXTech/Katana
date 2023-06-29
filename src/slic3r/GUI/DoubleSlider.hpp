@@ -430,9 +430,9 @@ private:
 // control's view variables
     wxCoord SLIDER_MARGIN; // margin around slider
 
-    wxPen   DARK_ORANGE_PEN;
-    wxPen   ORANGE_PEN;
-    wxPen   LIGHT_ORANGE_PEN;
+    wxPen   DARK_RED_PEN;
+    wxPen   RED_PEN;
+    wxPen   LIGHT_RED_PEN;
 
     wxPen   DARK_GREY_PEN;
     wxPen   GREY_PEN;

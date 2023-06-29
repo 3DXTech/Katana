@@ -1727,7 +1727,7 @@ void GLGizmoCut3D::render_shortcuts()
 
     if (m_show_shortcuts)
         for (const auto&shortcut : m_shortcuts ){
-            m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, shortcut.first);
+            m_imgui->text_colored(ImGuiWrapper::COL_RED_LIGHT, shortcut.first);
             ImGui::SameLine(m_shortcut_label_width);
             m_imgui->text(shortcut.second);
         }
@@ -1757,7 +1757,7 @@ void GLGizmoCut3D::render_connectors_input_window(CutConnectors &connectors)
     // render_connect_mode_radio_button(CutConnectorMode::Manual);
 
     ImGui::AlignTextToFramePadding();
-    m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, m_labels_map["Connectors"]);
+    m_imgui->text_colored(ImGuiWrapper::COL_RED_LIGHT, m_labels_map["Connectors"]);
 
     m_imgui->disabled_begin(connectors.empty());
     ImGui::SameLine(m_label_width);
@@ -1832,7 +1832,7 @@ void GLGizmoCut3D::render_build_size()
     ImGui::AlignTextToFramePadding();
     m_imgui->text(_L("Build Volume"));
     ImGui::SameLine();
-    m_imgui->text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, size);
+    m_imgui->text_colored(ImGuiWrapper::COL_RED_LIGHT, size);
 }
 
 void GLGizmoCut3D::reset_cut_plane()
@@ -1957,7 +1957,7 @@ void GLGizmoCut3D::render_cut_plane_input_window(CutConnectors &connectors)
         ImGui::AlignTextToFramePadding();
         ImGuiWrapper::text(wxString(ImGui::InfoMarkerSmall));
         ImGui::SameLine();
-        ImGuiWrapper::text_colored(ImGuiWrapper::COL_ORANGE_LIGHT,
+        ImGuiWrapper::text_colored(ImGuiWrapper::COL_RED_LIGHT,
                               get_wraped_wxString(_L("Hold SHIFT key to draw a cut line"), 40));
         ImGui::Separator();
 
