@@ -4191,7 +4191,7 @@ void GCodeProcessor::post_process()
                         if (GCodeReader::GCodeLine::cmd_is(gcode_line, "G1"))
                             // add lines M73 where needed
                             process_line_G1(g1_lines_counter++);
-                        else if (m_result.backtrace_enabled && GCodeReader::GCodeLine::cmd_starts_with(gcode_line, "T")) {
+                        else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, "T")) {
                             // add lines XXX where needed
                             process_line_T(gcode_line, g1_lines_counter, backtrace_T, m_result.backtrace_enabled);
                             max_backtrace_time = std::max(max_backtrace_time, backtrace_T.time);
