@@ -182,6 +182,8 @@ namespace Slic3r {
         bool annealing_step10_enabled;
         int annealing_temp10;
         int annealing_time10;
+        std::vector<double> heat_rate;
+        std::vector<double> cooldown_rate;
 
         PrintEstimatedStatistics print_statistics;
         std::vector<CustomGCode::Item> custom_gcode_per_print_z;
@@ -601,6 +603,7 @@ namespace Slic3r {
         ExtruderTemps m_extruder_temps_config;
         ExtruderTemps m_extruder_standbytemps_config;
         ExtruderTemps m_extruder_temps_first_layer_config;
+        std::vector<float> m_extruder_last_toolchange;
         bool  m_is_XL_printer = false;
         float m_parking_position;
         float m_extra_loading_move;

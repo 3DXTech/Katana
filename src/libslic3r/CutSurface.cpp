@@ -3323,7 +3323,7 @@ std::vector<bool> priv::select_patches(const ProjectionDistances &best_distances
             color << "#" << std::hex << std::setfill('0') << std::setw(2) << gray_level << gray_level << gray_level;
             svg.draw(p.shape, color.str());
             Point text_pos = get_extents(p.shape).center().cast<int>();
-            svg.draw_text(text_pos, std::to_string(i-1).c_str(), "orange", std::ceil(shape_bb.size().x() / 20 * 0.000001));
+            svg.draw_text(text_pos, std::to_string(i-1).c_str(), "red", std::ceil(shape_bb.size().x() / 20 * 0.000001));
             //svg.draw(p.intersection, color.str());
         }
 #endif // DEBUG_OUTPUT_DIR

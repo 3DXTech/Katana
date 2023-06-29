@@ -1015,7 +1015,7 @@ void PrintConfigDef::init_fff_params()
     def->multiline = true;
     def->full_width = true;
     def->height = 13;
-    def->mode = comAdvanced;
+    def->mode = comSimple;
     def->set_default_value(new ConfigOptionStrings { "" });
 
     def = this->add("filament_max_volumetric_speed", coFloats);

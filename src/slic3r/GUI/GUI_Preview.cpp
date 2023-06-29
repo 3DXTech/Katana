@@ -837,8 +837,7 @@ void Preview::load_print_as_fff(bool keep_z_range)
             const bool contains_color_gcodes = std::any_of(std::begin(gcodes), std::end(gcodes),
                 [] (auto const& item) { return item.type == CustomGCode::Type::ColorChange; });
             const GCodeViewer::EViewType choice = contains_color_gcodes ?
-                GCodeViewer::EViewType::ColorPrint :
-                (number_extruders > 1) ? GCodeViewer::EViewType::Tool : GCodeViewer::EViewType::FeatureType;
+                GCodeViewer::EViewType::ColorPrint : GCodeViewer::EViewType::FeatureType;
             if (choice != gcode_view_type) {
                 m_canvas->set_gcode_view_preview_type(choice);
                 if (wxGetApp().is_gcode_viewer())

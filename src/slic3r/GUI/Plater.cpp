@@ -705,10 +705,10 @@ void Sidebar::priv::show_preset_comboboxes()
 {
     const bool showSLA = wxGetApp().preset_bundle->printers.get_edited_preset().printer_technology() == ptSLA;
 
-    for (size_t i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 6; ++i)
         sizer_presets->Show(i, !showSLA);
 
-    for (size_t i = 4; i < 8; ++i)
+    for (size_t i = 6; i < 8; ++i)
         sizer_presets->Show(i, showSLA);
 
     frequently_changed_parameters->Show(!showSLA);
@@ -811,7 +811,8 @@ Sidebar::Sidebar(Plater *parent)
     const int margin_5 = int(0.5 * wxGetApp().em_unit());// 5;
 
     auto init_combo = [this, margin_5](PlaterPresetComboBox **combo, wxString label, Preset::Type preset_type, bool filament) {
-        auto *text = new wxStaticText(p->presets_panel, wxID_ANY, label + ":");
+        auto *text = label == _L("Filament") ? new wxStaticText(p->presets_panel, wxID_ANY, label + " :" + "\nE0 :") :
+                                               new wxStaticText(p->presets_panel, wxID_ANY, label + " :");
         text->SetFont(wxGetApp().small_font());
         *combo = new PlaterPresetComboBox(p->presets_panel, preset_type);
 
@@ -849,11 +850,11 @@ Sidebar::Sidebar(Plater *parent)
     };
 
     p->combos_filament.push_back(nullptr);
+    init_combo(&p->combo_printer,       _L("Printer"),            Preset::TYPE_PRINTER,       false);
     init_combo(&p->combo_print,         _L("Print settings"),     Preset::TYPE_PRINT,         false);
     init_combo(&p->combos_filament[0],  _L("Filament"),           Preset::TYPE_FILAMENT,      true);
     init_combo(&p->combo_sla_print,     _L("SLA print settings"), Preset::TYPE_SLA_PRINT,     false);
     init_combo(&p->combo_sla_material,  _L("SLA material"),       Preset::TYPE_SLA_MATERIAL,  false);
-    init_combo(&p->combo_printer,       _L("Printer"),            Preset::TYPE_PRINTER,       false);
 
     p->sizer_params = new wxBoxSizer(wxVERTICAL);
 
@@ -1008,6 +1009,12 @@ void Sidebar::init_filament_combo(PlaterPresetComboBox** combo, const int extr_i
 {
     *combo = new PlaterPresetComboBox(p->presets_panel, Slic3r::Preset::TYPE_FILAMENT);
     (*combo)->set_extruder_idx(extr_idx);
+
+    std::string label = "E" + std::to_string(extr_idx);
+    auto *      text  = new wxStaticText(p->presets_panel, wxID_ANY, label + " :");
+    text->SetFont(wxGetApp().small_font());
+
+    this->p->sizer_filaments->Add(text, 0, wxALIGN_LEFT | wxEXPAND | wxRIGHT, 4);
 
     auto combo_and_btn_sizer = new wxBoxSizer(wxHORIZONTAL);
     combo_and_btn_sizer->Add(*combo, 1, wxEXPAND);
