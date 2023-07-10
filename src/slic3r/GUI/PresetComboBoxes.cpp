@@ -893,8 +893,8 @@ void PlaterPresetComboBox::update()
         if (!preset.is_visible || (!is_compatible && !is_selected))
             continue;
 
-        if (preset.type == Preset::TYPE_FILAMENT && preset.config.opt_int("extruder_identity") != m_extruder_idx + 1)
-            continue;
+        /*if (preset.type == Preset::TYPE_FILAMENT && preset.config.opt_int("extruder_identity") != m_extruder_idx + 1)
+            continue;*/
 
         std::string bitmap_key, filament_rgb, extruder_rgb, material_rgb;
         std::string bitmap_type_name = bitmap_key = m_type == Preset::TYPE_PRINTER && preset.printer_technology() == ptSLA ? "sla_printer" : m_main_bitmap_name;
