@@ -548,10 +548,10 @@ GCodeProcessor::GCodeProcessor()
 : m_options_z_corrector(m_result)
 {
     reset();
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_main_mask = "M73 P%s R%s\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_stop_mask = "M73 C%s\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_main_mask = "M73 Q%s S%s\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_stop_mask = "M73 D%s\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_main_mask = !m_result.append_cr ? "M73 P%s R%s\n" : "M73 P%s R%s\r\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_stop_mask = !m_result.append_cr ? "M73 C%s\n" : "M73 C%s\r\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_main_mask = !m_result.append_cr ? "M73 Q%s S%s\n" : "M73 Q%s S%s\r\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_stop_mask = !m_result.append_cr ? "M73 D%s\n" : "M73 D%s\r\n";
 }
 
 void GCodeProcessor::apply_config(const PrintConfig& config)
@@ -4135,7 +4135,7 @@ void GCodeProcessor::post_process()
             totalTime += steps[i].time;
         }
 
-        export_lines.append_line("M73 P100 R" + std::to_string(totalTime) + "\n", m_line_id);
+        export_lines.append_line((!m_result.append_cr ? "M73 P100 R\n" : "M73 P100 R\r\n") + std::to_string(totalTime), m_line_id);
 
         for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
             if (!steps[i].enabled)
