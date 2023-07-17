@@ -3558,7 +3558,6 @@ void GCodeProcessor::post_process()
         {
             std::string line;
             float time;
-            int id;
         };
 
 #ifndef NDEBUG
@@ -3631,8 +3630,8 @@ void GCodeProcessor::post_process()
         }
 
         // add the given gcode line to the cache
-        void append_line(const std::string& line, const int line_id) {
-            m_lines.push_back({line, m_time, line_id});
+        void append_line(const std::string& line) {
+            m_lines.push_back({line, m_time});
 #ifndef NDEBUG
             m_statistics.add_line(line.length());
 #endif // NDEBUG
@@ -3740,6 +3739,7 @@ void GCodeProcessor::post_process()
             return m_lines.back().time;
         }
 
+        int line_num = 1;
         // write to file:
         // m_write_type == EWriteType::ByTime - all lines older than m_time - backtrace_time
         // m_write_type == EWriteType::BySize - all lines if current size is greater than 65535 bytes
@@ -3765,8 +3765,10 @@ void GCodeProcessor::post_process()
                     if (m_size > 65535) {
                         while (!m_lines.empty()) {
                             std::string line = m_lines.front().line;
-                            if (result.gcode_line_numbers)
-                                line.insert(0, "N" + std::to_string(m_lines.front().id) + " ");
+                            if (result.gcode_line_numbers && line[0] != ';') {
+                                line.insert(0, "N" + std::to_string(line_num) + " ");
+                                line_num++;
+                            }
 
                             out_string += line;
                             m_lines.pop_front();
@@ -3788,8 +3790,10 @@ void GCodeProcessor::post_process()
             std::string out_string;
             while (!m_lines.empty()) {
                 std::string line = m_lines.front().line;
-                if (result.gcode_line_numbers)
-                    line.insert(0, "N" + std::to_string(m_lines.front().id) + " ");
+                if (result.gcode_line_numbers && line[0] != ';') {
+                    line.insert(0, "N" + std::to_string(line_num) + " ");
+                    line_num++;
+                }
 
                 out_string += line;
                 m_lines.pop_front();
@@ -3853,14 +3857,13 @@ void GCodeProcessor::post_process()
                         // export pair <percent, remaining time>
                         export_lines.append_line(format_line_M73_main(machine.line_m73_main_mask.c_str(),
                             (line == reserved_tag(ETags::First_Line_M73_Placeholder)) ? 0 : 100,
-                            (line == reserved_tag(ETags::First_Line_M73_Placeholder)) ? time_in_minutes(machine.time) : 0), 
-                            m_line_id);
+                            (line == reserved_tag(ETags::First_Line_M73_Placeholder)) ? time_in_minutes(machine.time) : 0));
                         processed = true;
 
                         // export remaining time to next printer stop
                         if (line == reserved_tag(ETags::First_Line_M73_Placeholder) && !machine.stop_times.empty()) {
                             const int to_export_stop = time_in_minutes(machine.stop_times.front().elapsed_time);
-                            export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop), m_line_id);
+                            export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop));
                             last_exported_stop[i] = to_export_stop;
                         }
                     }
@@ -3875,7 +3878,7 @@ void GCodeProcessor::post_process()
                         sprintf(buf, "; estimated printing time (%s mode) = %s\n",
                             (mode == PrintEstimatedStatistics::ETimeMode::Normal) ? "normal" : "silent",
                             get_time_dhms(machine.time).c_str());
-                        export_lines.append_line(buf, m_line_id);
+                        export_lines.append_line(buf);
                         processed = true;
                     }
                 }
@@ -3887,7 +3890,7 @@ void GCodeProcessor::post_process()
                         sprintf(buf, "; estimated first layer printing time (%s mode) = %s\n",
                             (mode == PrintEstimatedStatistics::ETimeMode::Normal) ? "normal" : "silent",
                             get_time_dhms(machine.layers_time.empty() ? 0.f : machine.layers_time.front()).c_str());
-                        export_lines.append_line(buf, m_line_id);
+                        export_lines.append_line(buf);
                         processed = true;
                     }
                 }
@@ -3984,7 +3987,7 @@ void GCodeProcessor::post_process()
                                                                 time_in_minutes(machine.time - it->elapsed_time) };
                         if (last_exported_main[i] != to_export_main) {
                             export_lines.append_line(format_line_M73_main(machine.line_m73_main_mask.c_str(),
-                                to_export_main.first, to_export_main.second), m_line_id);
+                                to_export_main.first, to_export_main.second));
                             last_exported_main[i] = to_export_main;
                         }
                         // export remaining time to next printer stop
@@ -3995,7 +3998,7 @@ void GCodeProcessor::post_process()
                             if (last_exported_stop[i] != to_export_stop) {
                                 if (to_export_stop > 0) {
                                     if (last_exported_stop[i] != to_export_stop) {
-                                        export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop), m_line_id);
+                                        export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop));
                                         last_exported_stop[i] = to_export_stop;
                                     }
                                 }
@@ -4016,9 +4019,9 @@ void GCodeProcessor::post_process()
 
                                     if (is_last) {
                                         if (std::distance(machine.stop_times.begin(), it_stop) == static_cast<ptrdiff_t>(machine.stop_times.size() - 1))
-                                            export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop), m_line_id);
+                                            export_lines.append_line(format_line_M73_stop_int(machine.line_m73_stop_mask.c_str(), to_export_stop));
                                         else
-                                            export_lines.append_line(format_line_M73_stop_float(machine.line_m73_stop_mask.c_str(), time_in_last_minute(it_stop->elapsed_time - it->elapsed_time)), m_line_id);
+                                            export_lines.append_line(format_line_M73_stop_float(machine.line_m73_stop_mask.c_str(), time_in_last_minute(it_stop->elapsed_time - it->elapsed_time)));
 
                                         last_exported_stop[i] = to_export_stop;
                                     }
@@ -4135,14 +4138,14 @@ void GCodeProcessor::post_process()
             totalTime += steps[i].time;
         }
 
-        export_lines.append_line((!m_result.append_cr ? "M73 P100 R\n" : "M73 P100 R\r\n") + std::to_string(totalTime), m_line_id);
+        export_lines.append_line((!m_result.append_cr ? "M73 P100 R\n" : "M73 P100 R\r\n") + std::to_string(totalTime));
 
         for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + "\n", m_line_id);
-            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + "\n", m_line_id);
+            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + "\n");
+            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + "\n");
         }
     };
 
@@ -4201,7 +4204,7 @@ void GCodeProcessor::post_process()
                     }
 
                     if (!gcode_line.empty())
-                        export_lines.append_line(gcode_line, line_id);
+                        export_lines.append_line(gcode_line);
                     export_lines.write(out, 1.1f * max_backtrace_time, m_result, out_path);
                     gcode_line.clear();
                 }
