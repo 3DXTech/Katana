@@ -564,6 +564,7 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_result.backtrace_enabled = is_XL_printer(config);
     m_result.ooze_prevention   = config.ooze_prevention;
     m_result.append_cr                = config.append_cr;
+    line_end                          = (!m_result.append_cr ? "\n" : "\r\n");
     m_result.gcode_line_numbers       = config.gcode_line_numbers;
     m_result.heat_rate                = config.extruder_heat_rate.values;
     m_result.cooldown_rate            = config.extruder_cd_rate.values;
@@ -4063,7 +4064,7 @@ void GCodeProcessor::post_process()
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
                             const std::string out         = "M104 T" + std::to_string(tool_number) + " P" +
-                                                    std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature) + "\n";
+                                                    std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature) + line_end;
                             return out;
                         },
                         // line replacer
@@ -4088,7 +4089,7 @@ void GCodeProcessor::post_process()
                         [tool_number, this](unsigned int id, float time, float time_diff) {
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
-                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) +  (!m_result.append_cr ? "\n" : "\r\n");
+                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) +  line_end;
                             return out;
                         },
                         // line replacer
@@ -4138,14 +4139,14 @@ void GCodeProcessor::post_process()
             totalTime += steps[i].time;
         }
 
-        export_lines.append_line((!m_result.append_cr ? "M73 P100 R\n" : "M73 P100 R\r\n") + std::to_string(totalTime));
+        export_lines.append_line(("M73 P100 R" + line_end) + std::to_string(totalTime));
 
         for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + "\n");
-            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + "\n");
+            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + line_end);
+            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + line_end);
         }
     };
 
@@ -4182,7 +4183,7 @@ void GCodeProcessor::post_process()
                     ++line_id;
                     export_lines.update(line_id, g1_lines_counter);
 
-                    gcode_line += !m_result.append_cr ? "\n" : "\r\n";
+                    gcode_line += line_end;
 
                     // replace placeholder lines
                     bool processed = process_placeholders(gcode_line);
