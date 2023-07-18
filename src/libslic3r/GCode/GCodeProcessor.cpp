@@ -3770,11 +3770,8 @@ void GCodeProcessor::post_process()
                                 line_num++;
                             }
 
-                            if (result.append_cr) {
-                                std::size_t found = line.find("\n");
-                                if (found != std::string::npos)
-                                    line.replace(found, found + 1, "\r\n");
-                            }
+                            if (result.append_cr)
+                                append_carriagereturn(line);
 
                             out_string += line;
                             m_lines.pop_front();
@@ -3801,11 +3798,8 @@ void GCodeProcessor::post_process()
                     line_num++;
                 }
 
-                if (result.append_cr) {
-                    std::size_t found = line.find("\n");
-                    if (found != std::string::npos)
-                        line.replace(found, found + 1, "\r\n");
-                }
+                if (result.append_cr)
+                    append_carriagereturn(line);
 
                 out_string += line;
                 m_lines.pop_front();
@@ -3816,6 +3810,12 @@ void GCodeProcessor::post_process()
 #endif // NDEBUG
 
             write_to_file(out, out_string, result, out_path);
+        }
+
+        void append_carriagereturn(std::string& line) {
+            std::size_t found = line.find("\n");
+            if (found != std::string::npos)
+                line.replace(found, found + 1, "\r\n");
         }
 
         void synchronize_moves(GCodeProcessorResult& result) const {
