@@ -548,10 +548,10 @@ GCodeProcessor::GCodeProcessor()
 : m_options_z_corrector(m_result)
 {
     reset();
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_main_mask = !m_result.append_cr ? "M73 P%s R%s\n" : "M73 P%s R%s\r\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_stop_mask = !m_result.append_cr ? "M73 C%s\n" : "M73 C%s\r\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_main_mask = !m_result.append_cr ? "M73 Q%s S%s\n" : "M73 Q%s S%s\r\n";
-    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_stop_mask = !m_result.append_cr ? "M73 D%s\n" : "M73 D%s\r\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_main_mask = "M73 P%s R%s\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Normal)].line_m73_stop_mask = "M73 C%s\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_main_mask = "M73 Q%s S%s\n";
+    m_time_processor.machines[static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Stealth)].line_m73_stop_mask = "M73 D%s\n";
 }
 
 void GCodeProcessor::apply_config(const PrintConfig& config)
@@ -564,7 +564,6 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_result.backtrace_enabled = is_XL_printer(config);
     m_result.ooze_prevention   = config.ooze_prevention;
     m_result.append_cr                = config.append_cr;
-    line_end                          = (!m_result.append_cr ? "\n" : "\r\n");
     m_result.gcode_line_numbers       = config.gcode_line_numbers;
     m_result.heat_rate                = config.extruder_heat_rate.values;
     m_result.cooldown_rate            = config.extruder_cd_rate.values;
@@ -3771,6 +3770,12 @@ void GCodeProcessor::post_process()
                                 line_num++;
                             }
 
+                            if (result.append_cr) {
+                                std::size_t found = line.find("\n");
+                                if (found != std::string::npos)
+                                    line.replace(found, found + 1, "\r\n");
+                            }
+
                             out_string += line;
                             m_lines.pop_front();
                         }
@@ -3794,6 +3799,12 @@ void GCodeProcessor::post_process()
                 if (result.gcode_line_numbers && line[0] != ';') {
                     line.insert(0, "N" + std::to_string(line_num) + " ");
                     line_num++;
+                }
+
+                if (result.append_cr) {
+                    std::size_t found = line.find("\n");
+                    if (found != std::string::npos)
+                        line.replace(found, found + 1, "\r\n");
                 }
 
                 out_string += line;
@@ -4064,7 +4075,7 @@ void GCodeProcessor::post_process()
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
                             const std::string out         = "M104 T" + std::to_string(tool_number) + " P" +
-                                                    std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature) + line_end;
+                                                    std::to_string(int(std::round(time_diff))) + " S" + std::to_string(temperature);
                             return out;
                         },
                         // line replacer
@@ -4089,7 +4100,7 @@ void GCodeProcessor::post_process()
                         [tool_number, this](unsigned int id, float time, float time_diff) {
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
-                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) +  line_end;
+                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature);
                             return out;
                         },
                         // line replacer
@@ -4139,14 +4150,14 @@ void GCodeProcessor::post_process()
             totalTime += steps[i].time;
         }
 
-        export_lines.append_line(("M73 P100 R" + line_end) + std::to_string(totalTime));
+        export_lines.append_line(("M73 P100 R") + std::to_string(totalTime));
 
         for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M191 S" + std::to_string(steps[i].temp) + line_end);
-            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000) + line_end);
+            export_lines.append_line("M191 S" + std::to_string(steps[i].temp));
+            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000));
         }
     };
 
@@ -4183,7 +4194,7 @@ void GCodeProcessor::post_process()
                     ++line_id;
                     export_lines.update(line_id, g1_lines_counter);
 
-                    gcode_line += line_end;
+                    gcode_line += "\n";
 
                     // replace placeholder lines
                     bool processed = process_placeholders(gcode_line);
