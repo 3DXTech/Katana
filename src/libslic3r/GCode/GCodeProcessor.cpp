@@ -3906,6 +3906,16 @@ void GCodeProcessor::post_process()
                         processed = true;
                     }
                 }
+                for (size_t i = 0; i < static_cast<size_t>(PrintEstimatedStatistics::ETimeMode::Count); ++i) {
+                    const TimeMachine& machine = m_time_processor.machines[i];
+                    PrintEstimatedStatistics::ETimeMode mode = static_cast<PrintEstimatedStatistics::ETimeMode>(i);
+                    if (mode == PrintEstimatedStatistics::ETimeMode::Normal || machine.enabled) {
+                        char buf[128];
+                        sprintf(buf, ";TIME:%.0f\n", machine.time);
+                        export_lines.append_line(buf);
+                        processed = true;
+                    }
+                }
             }
         }
 
