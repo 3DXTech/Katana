@@ -674,6 +674,7 @@ PRINT_CONFIG_CLASS_DEFINE(
     ((ConfigOptionFloats,              filament_density))
     ((ConfigOptionStrings,             filament_type))
     ((ConfigOptionStrings,             filament_use))
+    ((ConfigOptionString,             material_guid))
     ((ConfigOptionBools,               filament_soluble))
     ((ConfigOptionInt,                 extruder_identity))
     ((ConfigOptionFloats,              filament_cost))
