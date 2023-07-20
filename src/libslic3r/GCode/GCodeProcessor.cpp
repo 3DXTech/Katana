@@ -4166,8 +4166,7 @@ void GCodeProcessor::post_process()
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M191 S" + std::to_string(steps[i].temp));
-            export_lines.append_line("G4 P" + std::to_string(steps[i].time * 60 * 1000));
+            export_lines.append_line("M230 S" + std::to_string(steps[i].temp) + " P" + std::to_string(steps[i].time * 60 * 1000) + " R" + std::to_string(totalTime));
         }
     };
 
