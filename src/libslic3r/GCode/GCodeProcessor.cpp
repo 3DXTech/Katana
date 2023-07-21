@@ -4160,13 +4160,13 @@ void GCodeProcessor::post_process()
             totalTime += steps[i].time;
         }
 
-        export_lines.append_line(("M73 P100 R") + std::to_string(totalTime));
+        export_lines.append_line(("M73 P100 R") + std::to_string(totalTime) + "\n");
 
         for (int i = 0; i < sizeof(steps) / sizeof(steps[0]); i++) {
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M230 S" + std::to_string(steps[i].temp) + " P" + std::to_string(steps[i].time * 60 * 1000) + " R" + std::to_string(totalTime));
+            export_lines.append_line("M230 S" + std::to_string(steps[i].temp) + " P" + std::to_string(steps[i].time * 60 * 1000) + " R" + std::to_string(totalTime)+ "\n");
         }
     };
 
