@@ -4110,7 +4110,7 @@ void GCodeProcessor::post_process()
                         [tool_number, this](unsigned int id, float time, float time_diff) {
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
-                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature);
+                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) + "\n";
                             return out;
                         },
                         // line replacer
@@ -4166,7 +4166,7 @@ void GCodeProcessor::post_process()
             if (!steps[i].enabled)
                 continue;
 
-            export_lines.append_line("M230 S" + std::to_string(steps[i].temp) + " P" + std::to_string(steps[i].time * 60 * 1000) + " R" + std::to_string(totalTime)+ "\n");
+            export_lines.append_line("M230 S" + std::to_string(steps[i].temp) + " P" + std::to_string(steps[i].time * 60) + " R" + std::to_string(totalTime * 60)+ "\n");
         }
     };
 
