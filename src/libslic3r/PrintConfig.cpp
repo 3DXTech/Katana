@@ -1176,6 +1176,10 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionStrings { "PLA" });
 
+    def = this->add("material_guid", coString);
+    def->set_default_value(new ConfigOptionString(L("(Unknown)")));
+    def->cli = ConfigOptionDef::nocli;
+
     def = this->add("filament_use", coStrings);
     def->label = L("Filament use");
     def->tooltip = L("The materials intended use during the print.");

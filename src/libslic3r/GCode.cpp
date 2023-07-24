@@ -984,6 +984,7 @@ namespace DoExport {
         print_statistics.initial_extruder_id = initial_extruder_id;
         std::vector<std::string> filament_types;
 	    if (! extruders.empty()) {
+	        std::pair<std::string, unsigned int> out_filament_used (";Filament used: ", 0);
 	        std::pair<std::string, unsigned int> out_filament_used_mm ("; filament used [mm] = ", 0);
 	        std::pair<std::string, unsigned int> out_filament_used_cm3("; filament used [cm3] = ", 0);
 	        std::pair<std::string, unsigned int> out_filament_used_g  ("; filament used [g] = ", 0);
@@ -1010,6 +1011,8 @@ namespace DoExport {
 	                dst.first += buf;
 	                ++ dst.second;
 	            };
+
+                append(out_filament_used, "%.2lfm", filament_weight);
 	            append(out_filament_used_mm,  "%.2lf", used_filament);
 	            append(out_filament_used_cm3, "%.2lf", extruded_volume * 0.001);
 	            if (filament_weight > 0.) {
@@ -1025,7 +1028,8 @@ namespace DoExport {
 	            print_statistics.total_wipe_tower_filament += has_wipe_tower ? used_filament - extruder.used_filament() : 0.;
 	            print_statistics.total_wipe_tower_cost += has_wipe_tower ? (extruded_volume - extruder.extruded_volume())* extruder.filament_density() * 0.001 * extruder.filament_cost() * 0.001 : 0.;
 	        }
-	        filament_stats_string_out += out_filament_used_mm.first;
+            filament_stats_string_out += out_filament_used.first;
+            filament_stats_string_out += "\n" + out_filament_used_mm.first;
             filament_stats_string_out += "\n" + out_filament_used_cm3.first;
             if (out_filament_used_g.second)
                 filament_stats_string_out += "\n" + out_filament_used_g.first;
@@ -1500,6 +1504,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
     file.write("\n");
     file.write_format("; total filament used [g] = %.2lf\n", print.m_print_statistics.total_weight);
     file.write_format("; total filament cost = %.2lf\n", print.m_print_statistics.total_cost);
+    file.write_format(";material_guid0: %s\n", print.config().material_guid.value.c_str());
     if (print.m_print_statistics.total_toolchanges > 0)
     	file.write_format("; total toolchanges = %i\n", print.m_print_statistics.total_toolchanges);
     file.write_format(";%s\n", GCodeProcessor::reserved_tag(GCodeProcessor::ETags::Estimated_Printing_Time_Placeholder).c_str());
