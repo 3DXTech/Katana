@@ -3478,8 +3478,8 @@ void GUI_App::app_version_check(bool from_user)
                 return;
         }
     }
-    std::string version_check_url = app_config->version_check_url();
-    m_app_updater->sync_version(version_check_url, from_user);
+    /*std::string version_check_url = app_config->version_check_url();
+    m_app_updater->sync_version(version_check_url, from_user);*/
 }
 
 void GUI_App::start_download(std::string url)
