@@ -2101,6 +2101,11 @@ void TabFilament::build()
         line.append_option(optgroup->get_option("chamber_temperature"));
         optgroup->append_line(line);
 
+        line = {L("Extruder limitations"), ""};
+        line.append_option(optgroup->get_option("extruder_heat_rate"));
+        line.append_option(optgroup->get_option("extruder_cd_rate"));
+        optgroup->append_line(line);
+
     page = add_options_page(L("Cooling"), "cooling");
         std::string category_path = "cooling_127569#";
         optgroup = page->new_optgroup(L("Enable"));
@@ -2939,7 +2944,7 @@ PageShp TabPrinter::build_kinematics_page()
 }
 
 const std::vector<std::string> extruder_options = {
-    "min_layer_height", "max_layer_height", "extruder_offset", "extruder_heat_rate", "extruder_cd_rate",
+    "min_layer_height", "max_layer_height", "extruder_offset"/*, "extruder_heat_rate", "extruder_cd_rate"*/,
     "retract_length", "retract_lift", "retract_lift_above", "retract_lift_below",
     "retract_speed", "deretract_speed", "retract_restart_extra", "retract_before_travel",
     "retract_layer_change", "wipe", "retract_before_wipe",
@@ -3116,9 +3121,9 @@ void TabPrinter::build_extruder_pages(size_t n_before_extruders)
         optgroup->append_single_option_line("retract_length_toolchange", "", extruder_idx);
         optgroup->append_single_option_line("retract_restart_extra_toolchange", "", extruder_idx);
 
-        optgroup = page->new_optgroup(L("Temperature limitations"));
+       /* optgroup = page->new_optgroup(L("Temperature limitations"));
         optgroup->append_single_option_line("extruder_heat_rate", "", extruder_idx);
-        optgroup->append_single_option_line("extruder_cd_rate", "", extruder_idx);
+        optgroup->append_single_option_line("extruder_cd_rate", "", extruder_idx);*/
     }
 
     // # remove extra pages

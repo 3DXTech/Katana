@@ -466,7 +466,8 @@ static std::vector<std::string> s_Preset_print_options {
 };
 
 static std::vector<std::string> s_Preset_filament_options {
-    "filament_colour", "filament_diameter", "filament_type", "material_guid", "filament_use", "extruder_identity", "filament_soluble", "filament_notes", "filament_max_volumetric_speed",
+    "filament_colour", "filament_diameter", "filament_type", "material_guid", "filament_use", "extruder_heat_rate", "extruder_cd_rate",
+    "extruder_identity", "filament_soluble", "filament_notes", "filament_max_volumetric_speed",
     "extrusion_multiplier", "filament_density", "filament_cost", "filament_spool_weight", "filament_loading_speed", "filament_loading_speed_start", "filament_load_time",
     "filament_unloading_speed", "filament_unloading_speed_start", "filament_unload_time", "filament_toolchange_delay", "filament_cooling_moves",
     "filament_cooling_initial_speed", "filament_cooling_final_speed", "filament_ramming_parameters", "filament_minimal_purge_on_wipe_tower",
@@ -490,7 +491,7 @@ static std::vector<std::string> s_Preset_machine_limits_options {
 };
 
 static std::vector<std::string> s_Preset_printer_options {
-    "printer_technology", "autoemit_temperature_commands", "extruder_heat_rate", "extruder_cd_rate",
+    "printer_technology", "autoemit_temperature_commands",/* "extruder_heat_rate", "extruder_cd_rate",*/
     "bed_shape", "bed_custom_texture", "bed_custom_model", "z_offset", "gcode_flavor", "use_relative_e_distances",
     "use_firmware_retraction", "use_volumetric_e", "variable_layer_height",
     //FIXME the print host keys are left here just for conversion from the Printer preset to Physical Printer preset.
