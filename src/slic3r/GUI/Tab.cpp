@@ -1648,7 +1648,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("slicing_mode");
         optgroup->append_single_option_line("resolution");
         optgroup->append_single_option_line("gcode_resolution");
-        optgroup->append_single_option_line("xy_size_compensation");
+        /*optgroup->append_single_option_line("xy_size_compensation");*/
         optgroup->append_single_option_line("elefant_foot_compensation", "elephant-foot-compensation_114487");
 
         optgroup = page->new_optgroup(L("Arachne perimeter generator"));
@@ -2067,6 +2067,7 @@ void TabFilament::build()
         optgroup->append_single_option_line("filament_colour");
         optgroup->append_single_option_line("filament_diameter");
         optgroup->append_single_option_line("extrusion_multiplier");
+        optgroup->append_single_option_line("xy_size_compensation");
         optgroup->append_single_option_line("filament_density");
         optgroup->append_single_option_line("filament_cost");
         optgroup->append_single_option_line("filament_spool_weight");
