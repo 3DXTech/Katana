@@ -1648,7 +1648,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("slicing_mode");
         optgroup->append_single_option_line("resolution");
         optgroup->append_single_option_line("gcode_resolution");
-        optgroup->append_single_option_line("xy_size_compensation");
+        /*optgroup->append_single_option_line("xy_size_compensation");*/
         optgroup->append_single_option_line("elefant_foot_compensation", "elephant-foot-compensation_114487");
 
         optgroup = page->new_optgroup(L("Arachne perimeter generator"));
@@ -2067,6 +2067,7 @@ void TabFilament::build()
         optgroup->append_single_option_line("filament_colour");
         optgroup->append_single_option_line("filament_diameter");
         optgroup->append_single_option_line("extrusion_multiplier");
+        optgroup->append_single_option_line("xy_size_compensation");
         optgroup->append_single_option_line("filament_density");
         optgroup->append_single_option_line("filament_cost");
         optgroup->append_single_option_line("filament_spool_weight");
@@ -2099,6 +2100,11 @@ void TabFilament::build()
 
         line = {L("Print Chamber"), ""};
         line.append_option(optgroup->get_option("chamber_temperature"));
+        optgroup->append_line(line);
+
+        line = {L("Extruder limitations"), ""};
+        line.append_option(optgroup->get_option("extruder_heat_rate"));
+        line.append_option(optgroup->get_option("extruder_cd_rate"));
         optgroup->append_line(line);
 
     page = add_options_page(L("Cooling"), "cooling");
@@ -2939,7 +2945,7 @@ PageShp TabPrinter::build_kinematics_page()
 }
 
 const std::vector<std::string> extruder_options = {
-    "min_layer_height", "max_layer_height", "extruder_offset", "extruder_heat_rate", "extruder_cd_rate",
+    "min_layer_height", "max_layer_height", "extruder_offset"/*, "extruder_heat_rate", "extruder_cd_rate"*/,
     "retract_length", "retract_lift", "retract_lift_above", "retract_lift_below",
     "retract_speed", "deretract_speed", "retract_restart_extra", "retract_before_travel",
     "retract_layer_change", "wipe", "retract_before_wipe",
@@ -3116,9 +3122,9 @@ void TabPrinter::build_extruder_pages(size_t n_before_extruders)
         optgroup->append_single_option_line("retract_length_toolchange", "", extruder_idx);
         optgroup->append_single_option_line("retract_restart_extra_toolchange", "", extruder_idx);
 
-        optgroup = page->new_optgroup(L("Temperature limitations"));
+       /* optgroup = page->new_optgroup(L("Temperature limitations"));
         optgroup->append_single_option_line("extruder_heat_rate", "", extruder_idx);
-        optgroup->append_single_option_line("extruder_cd_rate", "", extruder_idx);
+        optgroup->append_single_option_line("extruder_cd_rate", "", extruder_idx);*/
     }
 
     // # remove extra pages
