@@ -151,6 +151,7 @@ namespace Slic3r {
         std::vector<float> filament_diameters;
         std::vector<float> filament_densities;
         std::vector<float> filament_cost;
+        bool wipe_at_layer;
         bool annealing_enabled;
         bool annealing_step1_enabled;
         int annealing_temp1;

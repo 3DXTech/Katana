@@ -3308,6 +3308,11 @@ void PrintConfigDef::init_fff_params()
     def->mode = comAdvanced;
     def->set_default_value(new ConfigOptionInt(0));
 
+    def = this->add("wipe_at_layer", coBool);
+    def->label = L("Enable wiping at layer change");
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionBool(true));
+
     def = this->add("solid_infill_every_layers", coInt);
     def->label = L("Solid infill every");
     def->category = L("Infill");

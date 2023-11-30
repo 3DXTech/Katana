@@ -803,6 +803,7 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionFloats,             nozzle_diameter))
     ((ConfigOptionBool,               only_retract_when_crossing_perimeters))
     ((ConfigOptionBool,               ooze_prevention))
+    ((ConfigOptionBool,                wipe_at_layer))
     ((ConfigOptionBool,                annealing_enabled))
     ((ConfigOptionBool,                annealing_step1_enabled))
     ((ConfigOptionInt,                 annealing_temp1))
