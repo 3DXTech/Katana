@@ -2381,11 +2381,13 @@ void ConfigWizard::priv::load_pages()
     index->add_page(page_welcome);
 
     // Printers
-    if (!only_sla_mode)
-        index->add_page(page_fff);
-    index->add_page(page_msla);
     if (!only_sla_mode) {
-        index->add_page(page_vendors);
+        index->add_page(page_gearbox);
+        //index->add_page(page_fff);
+    }
+    //index->add_page(page_msla);
+    if (!only_sla_mode) {
+        //index->add_page(page_vendors);
 
         // Copy pages names from map to vector, so we can sort it without case sensitivity
         std::vector<std::pair<std::wstring, std::string>> sorted_vendors;
@@ -2457,7 +2459,7 @@ void ConfigWizard::priv::init_dialog_size()
         9*disp_rect.width / 10,
         9*disp_rect.height / 10);
 
-    const int width_hint = index->GetSize().GetWidth() + std::max(90 * em(), (only_sla_mode ? page_msla->get_width() : page_fff->get_width()) + 30 * em());    // XXX: magic constant, I found no better solution
+    const int width_hint = index->GetSize().GetWidth() + std::max(90 * em(), (only_sla_mode ? page_msla->get_width() : page_gearbox->get_width()) + 30 * em());    // XXX: magic constant, I found no better solution
     if (width_hint < window_rect.width) {
         window_rect.x += (window_rect.width - width_hint) / 2;
         window_rect.width = width_hint;
@@ -2554,7 +2556,7 @@ void ConfigWizard::priv::set_start_page(ConfigWizard::StartPage start_page)
 {
     switch (start_page) {
         case ConfigWizard::SP_PRINTERS: 
-            index->go_to(page_fff); 
+            index->go_to(page_gearbox); 
             btn_next->SetFocus();
             break;
         case ConfigWizard::SP_FILAMENTS:
@@ -3301,7 +3303,7 @@ void ConfigWizard::priv::update_presets_in_config(const std::string& section, co
 
 bool ConfigWizard::priv::check_fff_selected()
 {
-    bool ret = page_fff->any_selected();
+    bool ret = page_gearbox->any_selected();
     for (const auto& printer: pages_3rdparty)
         if (printer.second.first)               // FFF page
             ret |= printer.second.first->any_selected();
@@ -3378,23 +3380,30 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     wxGetApp().SetWindowVariantForButton(p->btn_finish);
     wxGetApp().SetWindowVariantForButton(p->btn_cancel);
 
-    const auto prusa_it = p->bundles.find("PrusaResearch");
+   const auto prusa_it = p->bundles.find("PrusaResearch");
     wxCHECK_RET(prusa_it != p->bundles.cend(), "Vendor PrusaResearch not found");
     const VendorProfile *vendor_prusa = prusa_it->second.vendor_profile;
 
+    const auto gearbox_it = p->bundles.find("Gearbox");
+    wxCHECK_RET(gearbox_it != p->bundles.cend(), "Vendor Gearbox not found");
+    const VendorProfile *vendor_gearbox = gearbox_it->second.vendor_profile;
+
     p->add_page(p->page_welcome = new PageWelcome(this));
 
-    
+    p->page_gearbox = new PagePrinters(this, _L("Gearbox Printers"), "Gearbox", *vendor_gearbox, 0, T_FFF);
+
     p->page_fff = new PagePrinters(this, _L("Prusa FFF Technology Printers"), "Prusa FFF", *vendor_prusa, 0, T_FFF);
-    p->only_sla_mode = !p->page_fff->has_printers;
+
+    p->only_sla_mode = !p->page_gearbox->has_printers;
     if (!p->only_sla_mode) {
-        p->add_page(p->page_fff);
-        p->page_fff->is_primary_printer_page = true;
+        p->add_page(p->page_gearbox);
+        /*p->add_page(p->page_fff);*/
+        p->page_gearbox->is_primary_printer_page = true;
     }
   
 
     p->page_msla = new PagePrinters(this, _L("Prusa MSLA Technology Printers"), "Prusa MSLA", *vendor_prusa, 0, T_SLA);
-    p->add_page(p->page_msla);
+    /*p->add_page(p->page_msla);*/
     if (p->only_sla_mode) {
         p->page_msla->is_primary_printer_page = true;
     }
@@ -3402,7 +3411,7 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     if (!p->only_sla_mode) {
 	    // Pages for 3rd party vendors
 	    p->create_3rdparty_pages();   // Needs to be done _before_ creating PageVendors
-	    p->add_page(p->page_vendors = new PageVendors(this));
+	    //p->add_page(p->page_vendors = new PageVendors(this));
 	    p->add_page(p->page_custom = new PageCustom(this));
         p->custom_printer_selected = p->page_custom->custom_wanted();
     }
@@ -3473,7 +3482,8 @@ ConfigWizard::ConfigWizard(wxWindow *parent)
     p->btn_sel_all->Bind(wxEVT_BUTTON, [this](const wxCommandEvent &) {
         p->any_sla_selected = true;
         p->load_pages();
-        p->page_fff->select_all(true, false);
+        p->page_gearbox->select_all(true, false);
+        /*p->page_fff->select_all(true, false);*/
         p->page_msla->select_all(true, false);
         p->index->go_to(p->page_mode);
     });
@@ -3560,7 +3570,7 @@ void ConfigWizard::on_dpi_changed(const wxRect &suggested_rect)
                                     p->btn_next->GetId(),
                                     p->btn_prev->GetId() });
 
-    for (auto printer_picker: p->page_fff->printer_pickers)
+    for (auto printer_picker: p->page_gearbox->printer_pickers)
         msw_buttons_rescale(this, em, printer_picker->get_button_indexes());
 
     p->init_dialog_size();

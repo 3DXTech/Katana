@@ -618,6 +618,7 @@ struct ConfigWizard::priv
     wxButton *btn_cancel = nullptr;
 
     PageWelcome      *page_welcome = nullptr;
+    PagePrinters     *page_gearbox = nullptr;
     PagePrinters     *page_fff = nullptr;
     PagePrinters     *page_msla = nullptr;
     PageMaterials    *page_filaments = nullptr;
