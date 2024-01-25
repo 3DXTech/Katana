@@ -1845,7 +1845,7 @@ void GCodeGenerator::print_machine_envelope(GCodeOutputStream &file, Print &prin
 // Write chamber temperature into the G-code.
 // Only do that if the start G-code does not already contain any M-code controlling an chamber temperature.
 // M141 - Set Chamber Temperature
-void GCode::_chamber_temperature(GCodeOutputStream &file, Print &print, const std::string &gcode, unsigned int chamber_id, bool wait)
+void GCodeGenerator::_chamber_temperature(GCodeOutputStream &file, Print &print, const std::string &gcode, unsigned int chamber_id, bool wait)
 {
     // Chamber temperature based on the model filament.
     int temp = print.config().chamber_temperature.get_at(chamber_id);

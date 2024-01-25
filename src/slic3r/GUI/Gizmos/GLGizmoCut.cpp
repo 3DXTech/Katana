@@ -2691,7 +2691,7 @@ void GLGizmoCut3D::render_cut_plane_input_window(CutConnectors &connectors)
         else if (mode == CutMode::cutTongueAndGroove) {
             m_is_slider_editing_done = false;
             ImGui::Separator();
-            ImGuiWrapper::text_colored(ImGuiWrapper::COL_ORANGE_LIGHT, m_labels_map["Groove"] + ": ");
+            ImGuiWrapper::text_colored(ImGuiWrapper::COL_RED_LIGHT, m_labels_map["Groove"] + ": ");
             render_groove_float_input(m_labels_map["Depth"], m_groove.depth, m_groove.depth_init, m_groove.depth_tolerance);
             render_groove_float_input(m_labels_map["Width"], m_groove.width, m_groove.width_init, m_groove.width_tolerance);
             render_groove_angle_input(m_labels_map["Flap Angle"], m_groove.flaps_angle, m_groove.flaps_angle_init, 30.f, 120.f);
