@@ -1437,7 +1437,7 @@ void TabPrint::build()
     load_initial_data();
 
     auto page = add_options_page(L("Layers and perimeters"), "layers");
-        std::string category_path = "layers-and-perimeters_1748#";
+        std::string category_path = "layers-and-perimeters#";
         auto optgroup = page->new_optgroup(L("Layer height"));
         optgroup->append_single_option_line("layer_height", category_path + "layer-height");
         optgroup->append_single_option_line("first_layer_height", category_path + "first-layer-height");
@@ -1478,7 +1478,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("avoid_crossing_perimeters", category_path + "avoid-crossing-perimeters");
         optgroup->append_single_option_line("avoid_crossing_perimeters_max_detour", category_path + "avoid_crossing_perimeters_max_detour");
         optgroup->append_single_option_line("thin_walls", category_path + "detect-thin-walls");
-        optgroup->append_single_option_line("thick_bridges", category_path + "thick_bridges");
+        optgroup->append_single_option_line("thick_bridges", category_path + "thick-bridges");
         optgroup->append_single_option_line("overhangs", category_path + "detect-bridging-perimeters");
 
         optgroup = page->new_optgroup(L("Advanced"));
@@ -1489,13 +1489,13 @@ void TabPrint::build()
         optgroup->append_single_option_line("perimeter_generator");
 
         optgroup = page->new_optgroup(L("Fuzzy skin (experimental)"));
-        category_path = "fuzzy-skin_246186/#";
+        category_path = "fuzzy-skin#";
         optgroup->append_single_option_line("fuzzy_skin", category_path + "fuzzy-skin-type");
         optgroup->append_single_option_line("fuzzy_skin_thickness", category_path + "fuzzy-skin-thickness");
         optgroup->append_single_option_line("fuzzy_skin_point_dist", category_path + "fuzzy-skin-point-distance");
 
     page = add_options_page(L("Infill"), "infill");
-        category_path = "infill_42#";
+        category_path = "infill#";
         optgroup = page->new_optgroup(L("Infill"));
         optgroup->append_single_option_line("fill_density", category_path + "fill-density");
         optgroup->append_single_option_line("fill_pattern", category_path + "fill-pattern");
@@ -1505,14 +1505,14 @@ void TabPrint::build()
         optgroup->append_single_option_line("bottom_fill_pattern", category_path + "bottom-fill-pattern");
 
         optgroup = page->new_optgroup(L("Ironing"));
-        category_path = "ironing_177488#";
+        category_path = "ironing#";
         optgroup->append_single_option_line("ironing", category_path);
         optgroup->append_single_option_line("ironing_type", category_path + "ironing-type");
         optgroup->append_single_option_line("ironing_flowrate", category_path + "flow-rate");
         optgroup->append_single_option_line("ironing_spacing", category_path + "spacing-between-ironing-passes");
 
         optgroup = page->new_optgroup(L("Reducing printing time"));
-        category_path = "infill_42#";
+        category_path = "infill#";
         optgroup->append_single_option_line("infill_every_layers", category_path + "combine-infill-every-x-layers");
         // optgroup->append_single_option_line("infill_only_where_needed", category_path + "only-infill-where-needed");
 
@@ -1525,7 +1525,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("infill_first");
 
     page = add_options_page(L("Skirt and brim"), "skirt+brim");
-        category_path = "skirt-and-brim_133969#";
+        category_path = "skirt-and-brim#";
         optgroup = page->new_optgroup(L("Skirt"));
         optgroup->append_single_option_line("skirts", category_path + "skirt");
         optgroup->append_single_option_line("skirt_distance", category_path + "skirt");
@@ -1539,7 +1539,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("brim_separation", category_path + "brim");
 
     page = add_options_page(L("Support material"), "support");
-        category_path = "support-material_1698#";
+        category_path = "support-material#";
         optgroup = page->new_optgroup(L("Support material"));
         optgroup->append_single_option_line("support_material", category_path + "generate-support-material");
         optgroup->append_single_option_line("support_material_auto", category_path + "auto-generated-supports");

@@ -1421,8 +1421,8 @@ bool GUI_App::on_init_inner()
     {
         wxString preferences_item = _L("Restore window position on start");
         InfoDialog dialog(nullptr,
-            _L("PrusaSlicer started after a crash"),
-            format_wxstr(_L("PrusaSlicer crashed last time when attempting to set window position.\n"
+            _L("KatanaSlicer started after a crash"),
+            format_wxstr(_L("KatanaSlicer crashed last time when attempting to set window position.\n"
                 "We are sorry for the inconvenience, it unfortunately happens with certain multiple-monitor setups.\n"
                 "More precise reason for the crash: \"%1%\".\n"
                 "For more information see our GitHub issue tracker: \"%2%\" and \"%3%\"\n\n"

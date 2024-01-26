@@ -1025,7 +1025,7 @@ wxString OptionsGroup::get_url(const std::string& path_end)
     wxString language = wxGetApp().current_language_code_safe();
     wxString lang_marker = language.IsEmpty() ? "en" : language.BeforeFirst('_');
 
-    return wxString("https://help.prusa3d.com/") + lang_marker + wxString("/article/" + path_end);
+    return wxString("https://www.3dxtech.com/blog/") + path_end /*lang_marker + wxString("/article/" + path_end)*/;
 }
 
 bool OptionsGroup::launch_browser(const std::string& path_end)

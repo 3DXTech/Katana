@@ -4498,7 +4498,7 @@ void GCodeProcessor::post_process()
     };
 
     auto process_layer_change = [this, &export_lines]() {
-        export_lines.append_line("G12\n");
+        export_lines.append_line("G12 P0\n");
     };
 
     m_result.lines_ends.clear();
