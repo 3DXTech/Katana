@@ -1640,6 +1640,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("support_material_extruder");
         optgroup->append_single_option_line("support_material_interface_extruder");
         optgroup->append_single_option_line("wipe_tower_extruder");
+        optgroup->append_single_option_line("wipe_at_layer");
 
         optgroup = page->new_optgroup(L("Ooze prevention"));
         optgroup->append_single_option_line("ooze_prevention");

@@ -486,6 +486,7 @@ void GCodeProcessorResult::reset() {
     filament_diameters = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_DIAMETER);
     filament_densities = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_DENSITY);
     filament_cost = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_COST);
+    wipe_at_layer = false;
     annealing_enabled = false;
     annealing_temp1 = 0;
     annealing_time1 = 0;
@@ -588,6 +589,7 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_result.gcode_line_numbers       = config.gcode_line_numbers;
     m_result.heat_rate                = config.extruder_heat_rate.values;
     m_result.cooldown_rate            = config.extruder_cd_rate.values;
+    m_result.wipe_at_layer            = config.wipe_at_layer;
     m_result.annealing_enabled        = config.annealing_enabled;
     m_result.annealing_step1_enabled  = config.annealing_step1_enabled;
     m_result.annealing_temp1          = config.annealing_temp1;
@@ -4495,6 +4497,10 @@ void GCodeProcessor::post_process()
         }
     };
 
+    auto process_layer_change = [this, &export_lines]() {
+        export_lines.append_line("G12\n");
+    };
+
     m_result.lines_ends.clear();
     m_result.lines_ends.emplace_back(std::vector<size_t>());
 
@@ -4558,6 +4564,8 @@ void GCodeProcessor::post_process()
                             max_backtrace_time = std::max(max_backtrace_time, backtrace_T.time);
                         } else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, ";anneal") && m_result.annealing_enabled) {
                             process_annealing_steps();
+                        } else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, ";LAYER_CHANGE") && m_result.wipe_at_layer) {
+                            process_layer_change();
                         }
                     }
 
