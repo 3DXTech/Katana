@@ -3435,6 +3435,14 @@ void PrintConfigDef::init_fff_params()
     def->mode = comExpert;
     def->set_default_value(new ConfigOptionBool(false));
 
+    def = this->add("wipe_at_number", coInt);
+    def->label = L("Wipe every X layers");
+    def->category = L("Extruders");
+    def->tooltip = L("Wipe at every layer number divisible by X.");
+    def->min = 1;
+    def->mode = comExpert;
+    def->set_default_value(new ConfigOptionInt(1));
+
     def = this->add("solid_infill_every_layers", coInt);
     def->label = L("Solid infill every");
     def->category = L("Infill");

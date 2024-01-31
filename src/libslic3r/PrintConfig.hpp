@@ -850,6 +850,7 @@ PRINT_CONFIG_CLASS_DERIVED_DEFINE(
     ((ConfigOptionBool,               only_retract_when_crossing_perimeters))
     ((ConfigOptionBool,               ooze_prevention))
     ((ConfigOptionBool,                wipe_at_layer))
+    ((ConfigOptionInt,                wipe_at_number))
     ((ConfigOptionBool,                annealing_enabled))
     ((ConfigOptionBool,                annealing_step1_enabled))
     ((ConfigOptionInt,                 annealing_temp1))

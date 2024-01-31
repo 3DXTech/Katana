@@ -487,6 +487,7 @@ void GCodeProcessorResult::reset() {
     filament_densities = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_DENSITY);
     filament_cost = std::vector<float>(MIN_EXTRUDERS_COUNT, DEFAULT_FILAMENT_COST);
     wipe_at_layer = false;
+    wipe_at_number = 1;
     annealing_enabled = false;
     annealing_temp1 = 0;
     annealing_time1 = 0;
@@ -590,6 +591,7 @@ void GCodeProcessor::apply_config(const PrintConfig& config)
     m_result.heat_rate                = config.extruder_heat_rate.values;
     m_result.cooldown_rate            = config.extruder_cd_rate.values;
     m_result.wipe_at_layer            = config.wipe_at_layer;
+    m_result.wipe_at_number           = config.wipe_at_number;
     m_result.annealing_enabled        = config.annealing_enabled;
     m_result.annealing_step1_enabled  = config.annealing_step1_enabled;
     m_result.annealing_temp1          = config.annealing_temp1;
@@ -4510,6 +4512,8 @@ void GCodeProcessor::post_process()
     // In case there are multiple sources of backtracing, keeps track of the longest backtrack time needed
     // to flush the backtrace cache accordingly
     float max_backtrace_time = 120.0f;
+    // Layers
+    int layerCounter = 0;
 
     {
         // Read the input stream 64kB at a time, extract lines and process them.
@@ -4565,7 +4569,10 @@ void GCodeProcessor::post_process()
                         } else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, ";anneal") && m_result.annealing_enabled) {
                             process_annealing_steps();
                         } else if (GCodeReader::GCodeLine::cmd_starts_with(gcode_line, ";LAYER_CHANGE") && m_result.wipe_at_layer) {
-                            process_layer_change();
+                            if (layerCounter % m_result.wipe_at_number == 0 && layerCounter != 0)
+                                process_layer_change();
+
+                            layerCounter++;
                         }
                     }
 

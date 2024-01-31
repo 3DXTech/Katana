@@ -3807,8 +3807,8 @@ std::string GCodeGenerator::set_extruder(unsigned int extruder_id, double print_
         check_add_eol(gcode);
     }
     // Set the new extruder to the operating temperature.
-    if (m_ooze_prevention.enable)
-        gcode += m_ooze_prevention.post_toolchange(*this);
+    /*if (m_ooze_prevention.enable)
+        gcode += m_ooze_prevention.post_toolchange(*this);*/
 
     // The position is now known after the tool change.
     this->m_last_pos_defined = false;
