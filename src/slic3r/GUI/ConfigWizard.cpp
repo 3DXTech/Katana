@@ -343,7 +343,9 @@ PrinterPicker::PrinterPicker(wxWindow *parent, const VendorProfile &vendor, wxSt
             const auto &variant = model.variants[i];
 
             const auto label = model.technology == ptFFF
-                ? format_wxstr("%1% %2% %3%", variant.name, _L("mm"), _L("nozzle"))
+                ? (vendor.name == "Gearbox" 
+                    ? FormatGearboxVariant(variant, vendor)
+                    : format_wxstr("%1% %2% %3%", variant.name, _L("mm"), _L("nozzle")))
                 : from_u8(model.name);
 
             if (i == 1) {
@@ -444,6 +446,14 @@ PrinterPicker::PrinterPicker(wxWindow *parent, const VendorProfile &vendor, wxSt
     sizer->Add(printer_grid);
 
     SetSizer(sizer);
+}
+
+wxString PrinterPicker::FormatGearboxVariant(const VendorProfile::PrinterVariant &variant, const VendorProfile &vendor) 
+{ 
+    if (variant.name == "0.5")
+        return format_wxstr("GBX20 %1%", _L("nozzle"));
+
+    return format_wxstr("%1% %2% %3%", variant.name, _L("mm"), _L("nozzle"));
 }
 
 PrinterPicker::PrinterPicker(wxWindow *parent, const VendorProfile &vendor, wxString title, size_t max_cols, const AppConfig &appconfig)

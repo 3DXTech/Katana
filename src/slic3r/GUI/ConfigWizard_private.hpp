@@ -126,6 +126,7 @@ struct PrinterPicker: wxPanel
     PrinterPicker(wxWindow *parent, const VendorProfile &vendor, wxString title, size_t max_cols, const AppConfig &appconfig, const ModelFilter &filter);
     PrinterPicker(wxWindow *parent, const VendorProfile &vendor, wxString title, size_t max_cols, const AppConfig &appconfig);
 
+    wxString FormatGearboxVariant(const VendorProfile::PrinterVariant &variant, const VendorProfile &vendor);
     void select_all(bool select, bool alternates = false);
     void select_one(size_t i, bool select);
     bool any_selected() const;
