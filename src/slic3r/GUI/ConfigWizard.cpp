@@ -452,6 +452,14 @@ wxString PrinterPicker::FormatGearboxVariant(const VendorProfile::PrinterVariant
 { 
     if (variant.name == "0.5")
         return format_wxstr("GBX20 %1%", _L("nozzle"));
+    else if (variant.name == "1.0")
+        return format_wxstr("GBX40 %1%", _L("nozzle"));
+    else if (variant.name == "0.4")
+        return format_wxstr("GBX16 %1%", _L("nozzle"));
+    else if (variant.name == "0.3")
+        return format_wxstr("GBX12 %1%", _L("nozzle"));
+    else if (variant.name == "0.25")
+        return format_wxstr("GBX10 %1%", _L("nozzle"));
 
     return format_wxstr("%1% %2% %3%", variant.name, _L("mm"), _L("nozzle"));
 }
