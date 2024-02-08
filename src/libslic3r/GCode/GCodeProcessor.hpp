@@ -660,7 +660,8 @@ namespace Slic3r {
             CraftWare,
             ideaMaker,
             KissSlicer,
-            BambuStudio
+            BambuStudio,
+            KatanaSlicer
         };
 
         struct AnnealingStep
