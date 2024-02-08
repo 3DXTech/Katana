@@ -4439,7 +4439,7 @@ void GCodeProcessor::post_process()
                         [tool_number, this](unsigned int id, float time, float time_diff) {
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
-                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) + "\n";
+                            const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) + " ; Set Preheat\n";
                             return out;
                         },
                         // line replacer
