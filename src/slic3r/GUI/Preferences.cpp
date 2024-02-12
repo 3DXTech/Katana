@@ -323,13 +323,13 @@ void PreferencesDialog::build()
 #ifdef _WIN32
 		// Please keep in sync with ConfigWizard
 		append_bool_option(m_optgroup_general, "associate_3mf",
-			L("Associate .3mf files to PrusaSlicer"),
-			L("If enabled, sets PrusaSlicer as default application to open .3mf files."),
+			L("Associate .3mf files to KatanaSlicer"),
+			L("If enabled, sets KatanaSlicer as default application to open .3mf files."),
 			app_config->get_bool("associate_3mf"));
 
 		append_bool_option(m_optgroup_general, "associate_stl",
-			L("Associate .stl files to PrusaSlicer"),
-			L("If enabled, sets PrusaSlicer as default application to open .stl files."),
+			L("Associate .stl files to KatanaSlicer"),
+			L("If enabled, sets KatanaSlicer as default application to open .stl files."),
 			app_config->get_bool("associate_stl"));
 #endif // _WIN32
 

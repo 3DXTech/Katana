@@ -2473,7 +2473,7 @@ void GUI_App::add_config_menu(wxMenuBar *menu)
         local_menu->Append(config_id_base + ConfigMenuWizard, config_wizard_name + dots, config_wizard_tooltip);
         local_menu->Append(config_id_base + ConfigMenuSnapshots, _L("&Configuration Snapshots") + dots, _L("Inspect / activate configuration snapshots"));
         local_menu->Append(config_id_base + ConfigMenuTakeSnapshot, _L("Take Configuration &Snapshot"), _L("Capture a configuration snapshot"));
-        local_menu->Append(config_id_base + ConfigMenuUpdateConf, _L("Check for Configuration Updates"), _L("Check for configuration updates"));
+        /*local_menu->Append(config_id_base + ConfigMenuUpdateConf, _L("Check for Configuration Updates"), _L("Check for configuration updates"));*/
         local_menu->Append(config_id_base + ConfigMenuUpdateApp, _L("Check for Application Updates"), _L("Check for new version of application"));
 #if defined(__linux__) && defined(SLIC3R_DESKTOP_INTEGRATION) 
         //if (DesktopIntegrationDialog::integration_possible())
@@ -3333,8 +3333,8 @@ bool GUI_App::config_wizard_startup()
         // Looks like user has legacy pre-vendorbundle data directory,
         // explain what this is and run the wizard
 
-        MsgDataLegacy dlg;
-        dlg.ShowModal();
+        /*MsgDataLegacy dlg;
+        dlg.ShowModal();*/
 
         run_wizard(ConfigWizard::RR_DATA_LEGACY);
         return true;

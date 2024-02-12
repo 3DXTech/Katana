@@ -1573,7 +1573,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("support_material_synchronize_layers", category_path + "synchronize-with-object-layers");
 
         optgroup = page->new_optgroup(L("Organic supports"));
-        const std::string path = "organic-supports_480131#organic-supports-settings";
+        const std::string path = "organic-supports#organic-supports-settings";
         optgroup->append_single_option_line("support_tree_angle", path);
         optgroup->append_single_option_line("support_tree_angle_slow", path);
         optgroup->append_single_option_line("support_tree_branch_diameter", path);
@@ -1625,12 +1625,12 @@ void TabPrint::build()
         optgroup->append_single_option_line("default_acceleration");
 
         optgroup = page->new_optgroup(L("Autospeed (advanced)"));
-        optgroup->append_single_option_line("max_print_speed", "max-volumetric-speed_127176");
-        optgroup->append_single_option_line("max_volumetric_speed", "max-volumetric-speed_127176");
+        optgroup->append_single_option_line("max_print_speed", "max-volumetric-speed");
+        optgroup->append_single_option_line("max_volumetric_speed", "max-volumetric-speed");
 
         optgroup = page->new_optgroup(L("Pressure equalizer (experimental)"));
-        optgroup->append_single_option_line("max_volumetric_extrusion_rate_slope_positive", "pressure-equlizer_331504");
-        optgroup->append_single_option_line("max_volumetric_extrusion_rate_slope_negative", "pressure-equlizer_331504");
+        optgroup->append_single_option_line("max_volumetric_extrusion_rate_slope_positive", "pressure-equlizer");
+        optgroup->append_single_option_line("max_volumetric_extrusion_rate_slope_negative", "pressure-equlizer");
 
     page = add_options_page(L("Multiple Extruders"), "funnel");
         optgroup = page->new_optgroup(L("Extruders"));
@@ -1689,7 +1689,7 @@ void TabPrint::build()
         optgroup->append_single_option_line("gcode_resolution");
         optgroup->append_single_option_line("arc_fitting");
         optgroup->append_single_option_line("xy_size_compensation");
-        optgroup->append_single_option_line("elefant_foot_compensation", "elephant-foot-compensation_114487");
+        optgroup->append_single_option_line("elefant_foot_compensation", "elephant-foot-compensation");
 
         optgroup = page->new_optgroup(L("Arachne perimeter generator"));
         optgroup->append_single_option_line("wall_transition_angle");
@@ -1757,7 +1757,7 @@ void TabPrint::build()
 
         page     = add_options_page(L("Output options"), "output+page_white");
         optgroup = page->new_optgroup(L("Sequential printing"));
-        optgroup->append_single_option_line("complete_objects", "sequential-printing_124589");
+        optgroup->append_single_option_line("complete_objects", "sequential-printing");
         line = { L("Extruder clearance"), "" };
         line.append_option(optgroup->get_option("extruder_clearance_radius"));
         line.append_option(optgroup->get_option("extruder_clearance_height"));
@@ -2317,7 +2317,7 @@ void TabFilament::build()
         optgroup->append_single_option_line("filament_soluble");
 
         optgroup = page->new_optgroup(L("Print speed override"));
-        optgroup->append_single_option_line("filament_max_volumetric_speed", "max-volumetric-speed_127176");
+        optgroup->append_single_option_line("filament_max_volumetric_speed", "max-volumetric-speed");
 
         line = { "", "" };
         line.full_width = 1;
