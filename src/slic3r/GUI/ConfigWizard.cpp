@@ -3250,8 +3250,9 @@ bool ConfigWizard::priv::apply_config(AppConfig *app_config, PresetBundle *prese
 
     app_config->set_vendors(appconfig_new);
 
-    app_config->set("notify_release", page_update->version_check ? "all" : "none");
-    app_config->set("preset_update", page_update->preset_update ? "1" : "0");
+    // Commented to avoid automatic updates at the moment
+    //app_config->set("notify_release", page_update->version_check ? "all" : "none");
+    //app_config->set("preset_update", page_update->preset_update ? "1" : "0");
     app_config->set("export_sources_full_pathnames", page_reload_from_disk->full_pathnames ? "1" : "0");
 
 #ifdef _WIN32
