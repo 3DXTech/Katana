@@ -3329,7 +3329,8 @@ bool GUI_App::config_wizard_startup()
     if (!m_app_conf_exists || preset_bundle->printers.only_default_printers()) {
         run_wizard(ConfigWizard::RR_DATA_EMPTY);
         return true;
-    } else if (false/*get_app_config()->legacy_datadir()*/) {
+    } else if (false/*get_app_config()->legacy_datadir()*/) // Always returning false for now to disable config wizard on every startup
+    {
         // Looks like user has legacy pre-vendorbundle data directory,
         // explain what this is and run the wizard
 
