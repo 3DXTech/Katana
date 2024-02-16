@@ -2135,9 +2135,9 @@ void PrintConfigDef::init_fff_params()
     def = this->add("ooze_prevention", coBool);
     def->label = L("Enable");
     // TRN PrintSettings: Enable ooze prevention
-    def->tooltip = L("This option will drop the temperature of the inactive extruders to prevent oozing.");
+    def->tooltip = L("This option will drop the temperature of the inactive extruders to their idle temperature to prevent oozing. Also it enables preheating of the next active extruder.");
     def->mode = comExpert;
-    def->set_default_value(new ConfigOptionBool(false));
+    def->set_default_value(new ConfigOptionBool(true));
 
     def = this->add("output_filename_format", coString);
     def->label = L("Output filename format");

@@ -1645,7 +1645,7 @@ void TabPrint::build()
 
         optgroup = page->new_optgroup(L("Ooze prevention"));
         optgroup->append_single_option_line("ooze_prevention");
-        optgroup->append_single_option_line("standby_temperature_delta");
+        //optgroup->append_single_option_line("standby_temperature_delta");
 
         optgroup = page->new_optgroup(L("Wipe tower"));
         optgroup->append_single_option_line("wipe_tower");

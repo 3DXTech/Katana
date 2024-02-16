@@ -3691,6 +3691,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -3707,6 +3715,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -15958,7 +15982,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_A47BE3B8D2D241F496B9B8F4D4E95089"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]3DXTECH\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder]3DXTECH\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -16436,7 +16460,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Katana Slicer"
         "ProductCode" = "8:{945B0A35-8333-4A8C-A6C4-7249C35FC0AA}"
-        "PackageCode" = "8:{655B3C8F-DBDF-4CCE-8682-F9B9B71346B2}"
+        "PackageCode" = "8:{DC2BDCE7-947F-47BD-B636-744526A31EC2}"
         "UpgradeCode" = "8:{287A51C0-14F3-44A1-894F-4BB26FCC38B7}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
