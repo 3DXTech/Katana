@@ -32,6 +32,7 @@ Key features added are:
 * extruder identity
 * temperature limitations per filament
 * XY compensation can be applied per filament
+* smart extruder preheat for multi-extruder printers 
 
 
 ### Development
