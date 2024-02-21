@@ -1919,7 +1919,7 @@ void GCodeGenerator::_print_first_layer_extruder_temperatures(GCodeOutputStream 
                 }
 
                 if (temp > 0)
-                    file.write(m_writer.set_temperature(temp, wait, tool_id));
+                    file.write(m_writer.set_temperature(temp, tool_id == first_printing_extruder_id ? wait : false, tool_id));
             }
         }
     }
