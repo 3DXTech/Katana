@@ -629,6 +629,7 @@ namespace Slic3r {
         ExtruderTemps m_extruder_standbytemps_config;
         ExtruderTemps m_extruder_temps_first_layer_config;
         std::vector<float> m_extruder_last_toolchange;
+        std::vector<int> m_toolchanges;
         bool  m_is_XL_printer = false;
         float m_parking_position;
         float m_extra_loading_move;

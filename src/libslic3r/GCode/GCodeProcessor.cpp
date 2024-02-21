@@ -23,6 +23,7 @@
 
 #include <float.h>
 #include <assert.h>
+#include <algorithm>
 
 #if __has_include(<charconv>)
     #include <charconv>
@@ -4441,6 +4442,9 @@ void GCodeProcessor::post_process()
                         [tool_number, this](unsigned int id, float time, float time_diff) {
                             int               temperature = int(m_layer_id != 1 ? m_extruder_temps_config[tool_number] :
                                                                                   m_extruder_temps_first_layer_config[tool_number]);
+                            if (tool_number == 0 && !(std::find(m_toolchanges.begin(), m_toolchanges.end(), 0) != m_toolchanges.end()))
+                                temperature = m_extruder_temps_first_layer_config[tool_number];
+
                             const std::string out = "M104 T" + std::to_string(tool_number) + " S" + std::to_string(temperature) + " ; Set Preheat\n";
                             return out;
                         },
@@ -4465,6 +4469,8 @@ void GCodeProcessor::post_process()
                         m_result.heat_rate[0],      // needs to be changed
                         m_result.cooldown_rate[0]); // needs to be changed
                 }
+
+                m_toolchanges.push_back(tool_number);
             }
         }
     };
